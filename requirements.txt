@@ -1,0 +1,17 @@
+jupyterlab
+ipykernel
+numpy
+pandas
+openpyxl
+matplotlib
+scipy
+scikit-learn
+spacy
+gensim
+wordcloud
+joblib
+torch
+transformers
+datasets
+accelerate
+tqdm

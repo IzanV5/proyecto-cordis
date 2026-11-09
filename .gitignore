@@ -1,0 +1,27 @@
+# Datos del profesor y archivos generados localmente
+*.xlsx
+*.xls
+datos/cache/
+*.npy
+*.npz
+*.joblib
+*.pkl
+*.pt
+*.pth
+*.safetensors
+checkpoints/
+modelos/
+wandb/
+runs/
+
+# Entorno y archivos temporales
+.venv/
+venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.env
+.env.*
+Thumbs.db
+.DS_Store
+__MACOSX/
