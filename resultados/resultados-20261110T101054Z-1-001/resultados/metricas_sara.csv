@@ -1,0 +1,2 @@
+experimento,representacion,modelo,nivel,conjunto,accuracy,macro_f1
+finetuning_bert_n2_lr2e-05,texto original,BERT fine-tuning,2,val,0.5725453408380238,0.3380729772428865

@@ -1,0 +1,72 @@
+{
+  "fecha": "2026-11-10T09:24:20",
+  "modelo": "bert-base-uncased",
+  "congelado": true,
+  "pooling": "media de la última capa sobre tokens con attention_mask=1 (incluye [CLS] y [SEP])",
+  "max_len": 512,
+  "truncamiento": "se conservan los primeros 512 tokens",
+  "texto": "summary original, sin preprocesamiento",
+  "batch_size": 32,
+  "ordenado_por_longitud": true,
+  "dispositivo": "Tesla T4",
+  "minutos": {
+    "train": 9.83,
+    "val": 4.96,
+    "test": 1.68
+  },
+  "dimensiones": {
+    "train": [
+      19189,
+      768
+    ],
+    "val": [
+      9594,
+      768
+    ],
+    "test": [
+      3199,
+      768
+    ]
+  },
+  "truncamiento_medido": [
+    {
+      "conjunto": "train",
+      "resumenes": 19189,
+      "tokens_media": 354.5,
+      "tokens_mediana": 366,
+      "tokens_p95": 422,
+      "tokens_max": 838,
+      "truncados": 15,
+      "porcentaje_truncados": 0.08,
+      "tokens_perdidos_media": 105.2
+    },
+    {
+      "conjunto": "val",
+      "resumenes": 9594,
+      "tokens_media": 355.4,
+      "tokens_mediana": 367,
+      "tokens_p95": 423,
+      "tokens_max": 772,
+      "truncados": 10,
+      "porcentaje_truncados": 0.1,
+      "tokens_perdidos_media": 114.1
+    },
+    {
+      "conjunto": "test",
+      "resumenes": 3199,
+      "tokens_media": 354.6,
+      "tokens_mediana": 366,
+      "tokens_p95": 423,
+      "tokens_max": 538,
+      "truncados": 3,
+      "porcentaje_truncados": 0.09,
+      "tokens_perdidos_media": 14.7
+    }
+  ],
+  "versiones": {
+    "python": "3.13.16",
+    "torch": "2.14.1+cu130",
+    "transformers": "5.22.1"
+  },
+  "semilla": 42
+}
