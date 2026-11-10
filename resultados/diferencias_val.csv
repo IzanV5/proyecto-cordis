@@ -1,0 +1,4 @@
+nivel,modelo_a,modelo_b,dif_accuracy,dif_accuracy_ic,accuracy_significativa,dif_macro_f1,dif_macro_f1_ic,macro_f1_significativa
+2,finetuning_bert_n2_lr3e-05,baseline_mayoritaria_n2,0.4761894934333959,"(0.465, 0.488)",True,0.3637380904725965,"(0.3527, 0.375)",True
+2,finetuning_bert_n2_lr3e-05,finetuning_bert_n2_lr2e-05,0.01245789034813425,"(0.0073, 0.0176)",True,0.03127494837800049,"(0.0228, 0.0402)",True
+1,finetuning_bert_n1_lr3e-05,baseline_mayoritaria_n1,0.32313831561392536,"(0.3096, 0.336)",True,0.5817839052481326,"(0.5676, 0.5953)",True

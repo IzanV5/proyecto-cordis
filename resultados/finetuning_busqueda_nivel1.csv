@@ -1,0 +1,2 @@
+experimento,nivel,learning_rate,epocas,batch,max_len,mejor_checkpoint,val_accuracy,val_macro_f1,minutos,gpu,torch,transformers,semilla
+finetuning_bert_n1_lr3e-05,1,3e-05,3,16,512,/content/checkpoints/finetuning_bert_n1_lr3e-05/checkpoint-3600,0.7149259954138003,0.6758201376710803,34.3,Tesla T4,2.14.1+cu130,5.22.1,42
