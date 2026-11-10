@@ -1,8 +1,18 @@
 experimento,representacion,modelo,nivel,conjunto,accuracy,macro_f1,origen
 baseline_mayoritaria_n2,ninguna,clase mayoritaria,2,test,0.10847139731165989,0.005018294358395881,baseline (cuaderno 03)
+izan_lr_tfidf_n2,TF-IDF,Regresión logística,2,val,0.4908276005836981,0.3953844935704941,izan
+izan_lr_tfidf_metadatos_n2,TF-IDF + metadatos,Regresión logística,2,val,0.4863456326870961,0.3728504979547791,izan
 finetuning_bert_n2_lr3e-05,texto original,BERT fine-tuning,2,val,0.5849489264123411,0.3695605365709178,sara
 finetuning_bert_n2_lr2e-05,texto original,BERT fine-tuning,2,val,0.5725453408380238,0.3380729772428865,sara
+izan_mlp_word2vec_n2,Word2Vec,Red propia PyTorch,2,val,0.4074421513445904,0.3143884995825907,izan
+izan_lr_word2vec_n2,Word2Vec,Regresión logística,2,val,0.4437148217636023,0.2933059462586061,izan
+izan_lr_bert_n2,BERT congelado,Regresión logística,2,val,0.4080675422138837,0.2688846748374155,izan
+izan_lr_metadatos_n2,Metadatos,Regresión logística,2,val,0.134667500521159,0.0246132406001269,izan
 baseline_mayoritaria_n2,ninguna,clase mayoritaria,2,val,0.10829685219929122,0.005011008302647539,baseline (cuaderno 03)
 baseline_mayoritaria_n1,ninguna,clase mayoritaria,1,test,0.3916849015317287,0.09381551362683438,baseline (cuaderno 03)
 finetuning_bert_n1_lr3e-05,texto original,BERT fine-tuning,1,val,0.7149259954138003,0.6758201376710803,sara
+izan_lr_tfidf_n1,TF-IDF,Regresión logística,1,val,0.6649989576818846,0.6255876465592572,izan
+izan_mlp_word2vec_n1,Word2Vec,Red propia PyTorch,1,val,0.6165311653116531,0.5765621972678016,izan
+izan_lr_bert_n1,BERT congelado,Regresión logística,1,val,0.6357098186366479,0.5754329933900043,izan
+izan_lr_word2vec_n1,Word2Vec,Regresión logística,1,val,0.6368563685636857,0.5746863562859382,izan
 baseline_mayoritaria_n1,ninguna,clase mayoritaria,1,val,0.3915989159891599,0.09380071405387862,baseline (cuaderno 03)
