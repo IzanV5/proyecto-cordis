@@ -291,10 +291,18 @@ def evaluar(y_real, y_predicha, clases=None):
     )
 
 
-def guardar_metricas(experimento, representacion, modelo, nivel, conjunto, metricas):
-    """Añade o actualiza una fila de resultados de un experimento concreto."""
+def guardar_metricas(
+    experimento, representacion, modelo, nivel, conjunto, metricas,
+    archivo="metricas.csv",
+):
+    """Añade o actualiza un resultado, permitiendo un CSV por persona.
+
+    Las llamadas anteriores siguen escribiendo en metricas.csv. Para trabajar
+    por separado se usa, por ejemplo, archivo="metricas_izan.csv".
+    """
     RESULTADOS.mkdir(parents=True, exist_ok=True)
-    ruta = RESULTADOS / "metricas.csv"
+    ruta = RESULTADOS / archivo
+    ruta.parent.mkdir(parents=True, exist_ok=True)
     fila = dict(
         experimento=experimento,
         representacion=representacion,
@@ -316,3 +324,29 @@ def guardar_metricas(experimento, representacion, modelo, nivel, conjunto, metri
         tabla = pd.DataFrame([fila])
     tabla.to_csv(ruta, index=False)
     return tabla
+
+
+def guardar_predicciones(experimento, nivel, conjunto, conjuntos, y_predicha):
+    """Guarda predicciones con el formato que consume el cuaderno de Sara."""
+    if nivel not in (1, 2) or conjunto not in NOMBRES_CONJUNTOS:
+        raise ValueError("El nivel o el conjunto indicado no es válido.")
+    parte = conjuntos[conjunto]
+    predicciones = np.asarray(y_predicha)
+    if predicciones.ndim != 1 or len(predicciones) != len(parte):
+        raise ValueError("Debe haber una predicción por proyecto del conjunto.")
+    columna = f"label_nivel{nivel}"
+    clases = set(conjuntos["train"][columna])
+    if not set(predicciones).issubset(clases):
+        raise ValueError("Las predicciones deben ser códigos de categoría de train.")
+    tabla = pd.DataFrame({
+        "projectID": parte["projectID"].to_numpy(),
+        "nivel": nivel,
+        "conjunto": conjunto,
+        "y_real": parte[columna].to_numpy(),
+        "y_pred": predicciones,
+    })
+    carpeta = RESULTADOS / "predicciones"
+    carpeta.mkdir(parents=True, exist_ok=True)
+    ruta = carpeta / f"{experimento}_{conjunto}.csv"
+    tabla.to_csv(ruta, index=False)
+    return ruta

@@ -4,9 +4,9 @@ Trabajo de Tratamiento de Datos sobre clasificación de proyectos de investigaci
 Queremos predecir el área científica de un proyecto a partir de su resumen y
 comparar distintas representaciones y modelos.
 
-**Estado:** base inicial organizada a partir del cuaderno que ya había hecho una
-persona del grupo. Los apartados marcados como pendientes se completarán al
-realizar los experimentos; todavía no hay una comparación final.
+**Estado:** resultados reales de validación de los modelos de Izan y del
+fine-tuning de Sara. Las decisiones se han elegido con validación. La evaluación
+final en test y el cierre de la comparación conjunta siguen pendientes.
 
 ## Cómo nos repartimos
 
@@ -15,7 +15,7 @@ y el extractor BERT. Esa aportación sigue siendo suya aunque el código esté
 repartido entre los tres cuadernos. Su carga nueva será menor para reconocer
 ese trabajo previo.
 
-| Persona | Archivos principales | Trabajo pendiente |
+| Persona | Archivos principales | Responsabilidad |
 | --- | --- | --- |
 | Mónica | `01_datos_y_representaciones.ipynb` | Revisar datos y etiquetas, generar TF-IDF y Word2Vec y explicar la exploración |
 | Izan | `02_modelos_y_extension.ipynb` y `funciones.py` | Mantener las funciones, ajustar clasificadores, hacer la red y la extensión |
@@ -33,7 +33,7 @@ El reparto detallado, las dependencias y el Gantt están en
 ## Qué hay en cada archivo
 
 - `01_datos_y_representaciones.ipynb`: preparación, exploración, TF-IDF y Word2Vec.
-- `02_modelos_y_extension.ipynb`: primera regresión logística y apartados para completar los otros modelos y la extensión.
+- `02_modelos_y_extension.ipynb`: clasificadores ajustados, red propia y extensión ejecutados en validación; evaluación final en test desactivada.
 - `03_bert_y_comparacion.ipynb`: BERT congelado, fine-tuning de BERT, tabla común de resultados, incertidumbre y análisis de errores.
 - `funciones.py`: funciones que comparten los cuadernos; responsable único: Izan.
 - `datos/`: Excel y vectores locales; quedan fuera de GitHub.
@@ -42,8 +42,9 @@ El reparto detallado, las dependencias y el Gantt están en
 
 El cuaderno original se conserva en su ubicación inicial fuera de esta carpeta.
 El código existente de preparación, representaciones, BERT y primera regresión
-logística se ha repartido entre estos archivos. Las salidas de los nuevos
-cuadernos se han limpiado para no presentar resultados antiguos como actuales.
+logística se repartió entre estos archivos. Se limpiaron sus salidas al crear la
+base; las salidas actuales de los cuadernos 02 y 03 corresponden a las ejecuciones
+registradas en resultados/.
 
 ## Problema y datos
 
@@ -113,9 +114,25 @@ con validación; el test se reserva para el final.
 
 Ya está trasladada la primera regresión logística con TF-IDF.
 
-**Pendiente para Izan:** ajustar los modelos con validación, probar las otras
-representaciones e implementar una red sencilla en PyTorch. Para Word2Vec,
-ajustar el escalado con train antes de usar un modelo que lo necesite.
+**Modelos de Izan.** Se ajusta regresión logística con TF-IDF, Word2Vec y BERT
+congelado, manteniendo los mismos proyectos y la misma búsqueda: `C` en
+`[0.5, 2.0]`, con y sin `class_weight="balanced"`. Se usa `lbfgs`, hasta 600
+iteraciones y tolerancia 0,001. Se elige por macro-F1 de validación; no se ha usado
+test. Word2Vec y BERT se estandarizan con train; TF-IDF permanece disperso y con
+su normalización del vectorizador. Se repite la búsqueda en niveles 1 y 2.
+
+La red propia de PyTorch usa Word2Vec, una capa oculta ReLU y dropout. Se prueban
+128 neuronas, dropout 0,2 y tasa 0,001, y 256 neuronas, dropout 0,3 y tasa 0,0005.
+Se entrena con Adam, lotes de 256 y entropía cruzada ponderada por la frecuencia
+inversa de las clases de train, hasta 30 épocas. Se detiene tras cinco épocas sin
+mejora en macro-F1 de validación y se recupera la mejor época. El escalado y el
+mapeo de categorías se aprenden solo con train. Se repite en nivel 1.
+
+Las representaciones TF-IDF y Word2Vec se regeneraron localmente con las
+funciones y parámetros iniciales de Mónica; BERT se cargó desde la caché de Sara.
+Las versiones efectivas están en `resultados/entorno_izan.json`, las búsquedas en
+`busqueda_lr_izan.csv` y `busqueda_red_izan.csv`, y las configuraciones elegidas en
+`resultados/configuraciones_izan.json`.
 
 **Fine-tuning de BERT (Sara).** A diferencia de BERT congelado, aquí se
 actualizan todos los pesos del Transformer con las etiquetas del problema. Se usa
@@ -153,13 +170,65 @@ demás transformaciones aprendidas se reajustan dentro de cada partición.
 
 ## Resultados y discusión
 
-> **Estado:** resultados **provisionales, en validación**. Todavía faltan los
-> modelos ajustados de Izan y la evaluación final en test, que se hará con las
-> decisiones cerradas.
+> **Estado:** resultados **provisionales, en validación** de Izan y Sara.
+> Quedan por integrar las nuevas comparaciones pareadas en el cuaderno 03 y
+> completar la evaluación final en test, con las decisiones cerradas.
 
 La tabla común `resultados/metricas.csv` la genera el cuaderno 03. Reúne
 `metricas_monica.csv`, `metricas_izan.csv` y `metricas_sara.csv`, si existen, y el
 baseline de clase mayoritaria calculado con los mismos proyectos.
+
+### Modelos de Izan en validación
+
+Todos se evaluaron sobre los mismos 9.594 proyectos que Sara. Se guardaron las
+predicciones con `projectID,nivel,conjunto,y_real,y_pred`, por lo que pueden
+incorporarse directamente al análisis pareado del cuaderno 03.
+
+| Modelo | Representación | Nivel | Accuracy val | Macro-F1 val |
+| --- | --- | ---: | ---: | ---: |
+| Red propia PyTorch | Word2Vec | 2 | 0.4074 | 0.3144 |
+| Regresión logística | BERT congelado | 2 | 0.4081 | 0.2689 |
+| Regresión logística | TF-IDF | 2 | 0.4908 | 0.3954 |
+| Regresión logística | Word2Vec | 2 | 0.4437 | 0.2933 |
+| Red propia PyTorch | Word2Vec | 1 | 0.6165 | 0.5766 |
+| Regresión logística | BERT congelado | 1 | 0.6357 | 0.5754 |
+| Regresión logística | TF-IDF | 1 | 0.6650 | 0.6256 |
+| Regresión logística | Word2Vec | 1 | 0.6369 | 0.5747 |
+
+La mejor configuración básica de Izan por macro-F1 de validación es
+`izan_lr_tfidf_n2` (0.3954). Esta es una selección sobre
+validación y puede resultar optimista. Las diferencias no se interpretan como
+significativas sin la comparación pareada de Sara y la evaluación final en test.
+
+![Búsqueda de regresión logística](resultados/graficas/izan_validacion_lr_n2.png)
+
+![Curvas de la red Word2Vec](resultados/graficas/izan_mlp_word2vec_n2_curvas.png)
+
+La red muestra una pérdida de entrenamiento que sigue bajando mientras la de
+validación se estanca y después aumenta. Se conserva la época de mayor macro-F1
+de validación (15 en nivel 2 y 6 en nivel 1), no la última época ejecutada.
+Para TF-IDF y `C=2`, ponderar las clases cambia la accuracy de 0,5152 a 0,4908,
+pero sube el macro-F1 de 0,3322 a 0,3954. Esto muestra el compromiso entre la
+accuracy global y el peso de las categorías pequeñas en nuestra métrica principal.
+
+Para comparar el efecto de la representación entre niveles se utiliza únicamente
+regresión logística, manteniendo el mismo clasificador. La red, el fine-tuning y
+la extensión se analizan aparte. El detalle está en
+`resultados/ranking_representaciones_izan_val.csv`.
+
+TF-IDF ocupa el primer puesto de regresión logística en las dos estimaciones.
+Word2Vec y BERT congelado intercambian su orden puntual, pero en nivel 1 su
+diferencia de macro-F1 es solo 0,0007; el intercambio no se interpreta como una
+ventaja clara sin contrastar su incertidumbre.
+
+![Representaciones con el mismo clasificador](resultados/graficas/izan_comparacion_representaciones_val.png)
+
+![Confusión de la mejor configuración básica de Izan](resultados/graficas/izan_confusion_mejor_n2_val.png)
+
+Los resultados completos están en `resultados/metricas_izan.csv`; los desgloses
+por clase en `resultados/izan_por_clase_*_val.csv` y las predicciones en
+`resultados/predicciones/izan_*_val.csv`. Los historiales de la red conservan
+todas las épocas ejecutadas para las dos configuraciones, no solo la ganadora.
 
 ### Fine-tuning de BERT (validación)
 
@@ -254,14 +323,36 @@ Pendiente:
 
 ## Extensión
 
-La propuesta es comparar un modelo que use solo texto, otro que use solo
-metadatos y otro que combine ambas cosas. Mantendremos las mismas particiones.
+Se compararon regresión logística con solo TF-IDF, solo metadatos y ambas
+entradas concatenadas, usando los mismos proyectos y las mismas cuatro opciones
+de ajuste. Se fijó TF-IDF como texto de esta extensión para aislar la aportación
+de los metadatos sin añadir una nueva selección entre representaciones.
 
-Se pueden usar coste, financiación europea, duración, país coordinador y número
-de países participantes. Las etiquetas y los códigos EuroSciVoc no son entradas.
-Las imputaciones, la codificación de países y el escalado se aprenden con train.
+Los metadatos son logaritmo de coste y financiación europea, duración en días,
+número de países participantes y país coordinador. Los ausentes numéricos se
+imputan con la mediana de train y se estandarizan; el país se codifica con
+one-hot aprendido en train, ignorando categorías nuevas. No se usan identificadores,
+etiquetas EuroSciVoc ni campos que reproduzcan el objetivo. Los proyectos con
+metadatos ausentes se conservan para mantener comparaciones sobre las mismas filas.
 
-**Pendiente:** implementación, tablas, gráficas y discusión.
+| Entrada | Accuracy val | Macro-F1 val |
+| --- | ---: | ---: |
+| TF-IDF | 0.4908 | 0.3954 |
+| Metadatos | 0.1347 | 0.0246 |
+| TF-IDF + metadatos | 0.4863 | 0.3729 |
+
+![Texto y metadatos](resultados/graficas/izan_extension_val.png)
+
+Con esta concatenación y esta búsqueda, añadir metadatos no mejora la estimación
+de TF-IDF solo: el macro-F1 pasa de 0,3954 a 0,3729. Los metadatos por sí solos
+alcanzan 0,0246, frente al 0,0050 del baseline de clase mayoritaria. Es un resultado
+negativo para la combinación empleada, útil para delimitar qué aporta el texto.
+
+Son resultados de validación después de elegir hiperparámetros. La comparación
+cuantifica lo obtenido con cada entrada en este protocolo; no demuestra una
+ventaja significativa sin analizar sus diferencias. Las predicciones de las tres
+opciones están disponibles para el bootstrap pareado de Sara. La evaluación
+final de la extensión en test sigue pendiente.
 
 ## Conclusiones y limitaciones
 
@@ -322,4 +413,6 @@ cada miembro y las diapositivas. La presentación y defensa son individuales.
 - Sara utilizó un asistente de IA (Claude, de Anthropic) como ayuda para preparar y
   revisar el código y los textos de su parte. Todos los resultados proceden de
   ejecuciones reales, registradas en `resultados/`.
+- Scikit-learn: regresión logística, preprocesamiento y métricas. PyTorch:
+  implementación de la red propia. Gensim y spaCy: Word2Vec y preprocesamiento.
 - Pendiente de completar con las referencias y ayudas utilizadas por el resto del grupo.

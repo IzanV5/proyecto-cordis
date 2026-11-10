@@ -1,0 +1,32 @@
+{
+  "semilla": 42,
+  "preprocesamiento": "spaCy lemas minúsculas sin stopwords, alfabéticos y longitud > 2",
+  "tfidf": {
+    "max_features": 10000,
+    "min_df": 5,
+    "max_df": 0.9,
+    "ngram_range": [
+      1,
+      2
+    ]
+  },
+  "word2vec": {
+    "vector_size": 300,
+    "window": 5,
+    "min_count": 2,
+    "workers": 1,
+    "sg": 1,
+    "epochs": 10,
+    "seed": 42
+  },
+  "regeneradas": [
+    "tfidf",
+    "word2vec"
+  ],
+  "versiones": {
+    "spacy": "3.8.18",
+    "en-core-web-sm": "3.8.0",
+    "gensim": "4.4.0",
+    "scikit-learn": "1.8.0"
+  }
+}

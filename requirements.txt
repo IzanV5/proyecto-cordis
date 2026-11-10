@@ -7,7 +7,7 @@ matplotlib
 scipy
 scikit-learn
 spacy
-gensim
+gensim>=4.4,<5
 wordcloud
 joblib
 torch

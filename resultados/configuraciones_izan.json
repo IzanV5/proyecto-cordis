@@ -1,0 +1,184 @@
+{
+  "semilla": 42,
+  "version": "izan-v1",
+  "criterio": "máximo macro-F1 de validación; test no usado",
+  "huellas_datos": {
+    "train": "36cf2c11bf6fc881d9d8ccdb8ba063297705c79b0788e822cf7401f2f5f6560e",
+    "val": "33be4b69b5c27f9690035b19929acd7742f9e2fb7476ad1db031f35dc1475373"
+  },
+  "hash_representaciones": {
+    "tfidf": "3b5fc021bc0b3be5dbc41cb58c802bd709f1b11ebcf11efa96e68c8f89bf0be7",
+    "word2vec": "202356d4427cf9ddd56ba67a69f3a1859d4574c22f2766e4fb11dce375140b00",
+    "bert": "6aa7d0f064d50cb07002794eadc36f28d841e98d37737e10de16562ef264be7a"
+  },
+  "modelos": {
+    "izan_lr_tfidf_n2": {
+      "nivel": 2,
+      "representacion": "TF-IDF",
+      "tipo": "lr",
+      "configuracion": {
+        "experimento": "izan_lr_tfidf_n2",
+        "representacion": "TF-IDF",
+        "nivel": 2,
+        "C": 2.0,
+        "class_weight": "balanced",
+        "accuracy": 0.4908276005836981,
+        "macro_f1": 0.39538449357049416,
+        "segundos": 11.09,
+        "convergencia": true,
+        "iteraciones": 37
+      }
+    },
+    "izan_lr_word2vec_n2": {
+      "nivel": 2,
+      "representacion": "Word2Vec",
+      "tipo": "lr",
+      "configuracion": {
+        "experimento": "izan_lr_word2vec_n2",
+        "representacion": "Word2Vec",
+        "nivel": 2,
+        "C": 0.5,
+        "class_weight": "ninguno",
+        "accuracy": 0.4437148217636023,
+        "macro_f1": 0.2933059462586061,
+        "segundos": 5.55,
+        "convergencia": true,
+        "iteraciones": 104
+      }
+    },
+    "izan_lr_bert_n2": {
+      "nivel": 2,
+      "representacion": "BERT congelado",
+      "tipo": "lr",
+      "configuracion": {
+        "experimento": "izan_lr_bert_n2",
+        "representacion": "BERT congelado",
+        "nivel": 2,
+        "C": 0.5,
+        "class_weight": "ninguno",
+        "accuracy": 0.4080675422138837,
+        "macro_f1": 0.26888467483741557,
+        "segundos": 19.0,
+        "convergencia": true,
+        "iteraciones": 169
+      }
+    },
+    "izan_lr_tfidf_n1": {
+      "nivel": 1,
+      "representacion": "TF-IDF",
+      "tipo": "lr",
+      "configuracion": {
+        "experimento": "izan_lr_tfidf_n1",
+        "representacion": "TF-IDF",
+        "nivel": 1,
+        "C": 2.0,
+        "class_weight": "balanced",
+        "accuracy": 0.6649989576818846,
+        "macro_f1": 0.6255876465592572,
+        "segundos": 1.98,
+        "convergencia": true,
+        "iteraciones": 48
+      }
+    },
+    "izan_lr_word2vec_n1": {
+      "nivel": 1,
+      "representacion": "Word2Vec",
+      "tipo": "lr",
+      "configuracion": {
+        "experimento": "izan_lr_word2vec_n1",
+        "representacion": "Word2Vec",
+        "nivel": 1,
+        "C": 2.0,
+        "class_weight": "ninguno",
+        "accuracy": 0.6368563685636857,
+        "macro_f1": 0.5746863562859382,
+        "segundos": 1.55,
+        "convergencia": true,
+        "iteraciones": 90
+      }
+    },
+    "izan_lr_bert_n1": {
+      "nivel": 1,
+      "representacion": "BERT congelado",
+      "tipo": "lr",
+      "configuracion": {
+        "experimento": "izan_lr_bert_n1",
+        "representacion": "BERT congelado",
+        "nivel": 1,
+        "C": 2.0,
+        "class_weight": "ninguno",
+        "accuracy": 0.6357098186366479,
+        "macro_f1": 0.5754329933900043,
+        "segundos": 6.43,
+        "convergencia": true,
+        "iteraciones": 172
+      }
+    },
+    "izan_mlp_word2vec_n2": {
+      "nivel": 2,
+      "representacion": "Word2Vec",
+      "tipo": "mlp",
+      "configuracion": {
+        "experimento": "izan_mlp_word2vec_n2",
+        "nivel": 2,
+        "config": 1,
+        "ocultas": 256,
+        "dropout": 0.3,
+        "lr": 0.0005,
+        "mejor_epoca": 15,
+        "macro_f1": 0.31438849958259074,
+        "segundos": 11.89
+      }
+    },
+    "izan_mlp_word2vec_n1": {
+      "nivel": 1,
+      "representacion": "Word2Vec",
+      "tipo": "mlp",
+      "configuracion": {
+        "experimento": "izan_mlp_word2vec_n1",
+        "nivel": 1,
+        "config": 1,
+        "ocultas": 256,
+        "dropout": 0.3,
+        "lr": 0.0005,
+        "mejor_epoca": 6,
+        "macro_f1": 0.5765621972678016,
+        "segundos": 6.19
+      }
+    },
+    "izan_lr_metadatos_n2": {
+      "nivel": 2,
+      "representacion": "Metadatos",
+      "tipo": "lr",
+      "configuracion": {
+        "experimento": "izan_lr_metadatos_n2",
+        "representacion": "Metadatos",
+        "nivel": 2,
+        "C": 2.0,
+        "class_weight": "ninguno",
+        "accuracy": 0.13466750052115906,
+        "macro_f1": 0.02461324060012693,
+        "segundos": 0.86,
+        "convergencia": true,
+        "iteraciones": 37
+      }
+    },
+    "izan_lr_tfidf_metadatos_n2": {
+      "nivel": 2,
+      "representacion": "TF-IDF + metadatos",
+      "tipo": "lr",
+      "configuracion": {
+        "experimento": "izan_lr_tfidf_metadatos_n2",
+        "representacion": "TF-IDF + metadatos",
+        "nivel": 2,
+        "C": 2.0,
+        "class_weight": "balanced",
+        "accuracy": 0.4863456326870961,
+        "macro_f1": 0.3728504979547791,
+        "segundos": 14.61,
+        "convergencia": true,
+        "iteraciones": 69
+      }
+    }
+  }
+}
