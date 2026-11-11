@@ -145,24 +145,60 @@ congelada permite atribuir la diferencia a la adaptación de los pesos.
 - Etiquetas: los códigos EuroSciVoc se convierten en índices 0…K−1 con las clases de
   train. El mapeo se guarda en `resultados/finetuning_mapeo_nivel{N}.json`.
 - Entrenamiento: AdamW, lote 16, 3 épocas, decaimiento de pesos 0,01, calentamiento
-  lineal del 10 % de los pasos, fp16 y semilla 42, en una GPU T4 de Colab. Estos
-  valores están dentro de los rangos que recomiendan Devlin et al. (2019) para BERT.
+  lineal del 10 % de los pasos, fp16 y semilla 42, en una GPU T4 (Colab para la
+  versión original; Kaggle para las mejoras). Estos valores están dentro de los rangos
+  que recomiendan Devlin et al. (2019) para BERT.
 - Selección: evaluación en validación al final de cada época, conservando la de
   mejor macro-F1. Entre tasas de aprendizaje también se elige por macro-F1 en
   validación. El test no interviene.
 
-| Tasa de aprendizaje | Épocas | Mejor época | Accuracy val | Macro-F1 val | Minutos |
-| ---: | ---: | ---: | ---: | ---: | ---: |
-| 2e-5 | 3 | 3 | 0,573 | 0,338 | 29,5 |
-| 3e-5 | 3 | 3 | 0,585 | 0,370 | 32,0 |
+**Mejoras tras la comparación conjunta.** La primera versión dejaba 9 categorías
+pequeñas con F1 = 0 y perdía en macro-F1 frente a TF-IDF con pesos de clase (ver la
+comparación conjunta). Por eso se probaron, eligiendo otra vez con validación:
 
-Configuración elegida: **tasa 3e-5**, por tener el mejor macro-F1 en validación. Su
-ventaja sobre 2e-5 (+0,031 de macro-F1) es significativa según el bootstrap pareado
-(IC 95 % de la diferencia: 0,023 a 0,040). Como esta misma validación se usó para
-elegir, la cifra de la configuración elegida puede ser algo optimista; la estimación
-sin sesgo será la de test. Detalle en
-`resultados/finetuning_busqueda_nivel2.csv`; historiales completos en
-`resultados/finetuning_bert_*_historial.json`.
+- **Pesos de clase** en la entropía cruzada: la raíz cuadrada de los pesos inversos a
+  la frecuencia de train, normalizados para que la pérdida media no cambie de escala.
+  Con los pesos inversos puros la clase más pequeña (6 proyectos en train) pesaría unas
+  350 veces más que la más frecuente; con la raíz, unas 19 veces (de 0,57 a 10,69).
+- **SciBERT** (`allenai/scibert_scivocab_uncased`, Beltagy et al., 2019): la misma
+  arquitectura que BERT, preentrenada con artículos científicos y con vocabulario propio.
+- **4 épocas**, porque el macro-F1 seguía subiendo en la tercera; se conserva igualmente
+  la mejor época según validación.
+
+El plan se ejecutó de forma automática en Kaggle (cuaderno 03, `EJECUTAR_PLAN_MEJORAS`):
+primero BERT con pesos; después SciBERT con la opción de pesos que mejor funcionó con
+BERT; y la mejor configuración de nivel 2, repetida en nivel 1.
+
+| Nivel | Modelo base | Pesos de clase | Tasa | Épocas | Mejor época | Accuracy val | Macro-F1 val | Minutos |
+| ---: | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 2 | BERT | No | 2e-5 | 3 | 3 | 0,573 | 0,338 | 29,5 |
+| 2 | BERT | No | 3e-5 | 3 | 3 | 0,585 | 0,370 | 32,0 |
+| 2 | BERT | Sí (raíz) | 3e-5 | 4 | 4 | 0,585 | 0,460 | 35,7 |
+| 2 | SciBERT | Sí (raíz) | 3e-5 | 4 | 4 | 0,588 | 0,479 | 34,1 |
+| 1 | BERT | No | 3e-5 | 3 | 3 | 0,715 | 0,676 | 34,3 |
+| 1 | SciBERT | Sí (raíz) | 3e-5 | 4 | 3 | 0,711 | 0,675 | 34,0 |
+
+Configuración elegida en **nivel 2: SciBERT con pesos de clase**, la de mayor macro-F1
+en validación. Las mejoras frente a la versión original, con el bootstrap pareado:
+
+- **Pesos de clase** (BERT con pesos − original): macro-F1 +0,091; IC 95 %: 0,071 a 0,107, significativo; la accuracy no
+  cambia (+0,000; IC 95 %: -0,007 a 0,007). La mejora no se debe a
+  la cuarta época: en la tercera, BERT con pesos ya tenía 0,453 de macro-F1, frente a 0,370.
+- **SciBERT** (SciBERT − BERT, ambos con pesos): macro-F1 +0,018; IC 95 %: 0,002 a 0,034, significativo pero
+  pequeño; la accuracy empata (+0,003; IC 95 %: -0,005 a 0,012).
+- En total (SciBERT con pesos − original): macro-F1 +0,109; IC 95 %: 0,089 a 0,126 con la
+  misma accuracy (+0,003; IC 95 %: -0,005 a 0,012).
+
+En **nivel 1 se mantiene el BERT original**: SciBERT con pesos empata con él
+(macro-F1 -0,001; IC 95 %: -0,013 a 0,010). Con 6 clases no hay categorías casi vacías que
+rescatar, así que los pesos aportan poco.
+
+La tasa 3e-5 se eligió antes frente a 2e-5 por macro-F1 en validación (+0,031,
+significativo; IC 95 % de 0,023 a 0,040). Como la misma validación se ha usado para
+elegir entre todas estas opciones, las cifras de las configuraciones elegidas pueden ser
+algo optimistas; la estimación sin sesgo será la de test. Detalle en
+`resultados/finetuning_busqueda_nivel{1,2}.csv`; historiales completos en
+`resultados/finetuning_*_historial.json`.
 
 Hay que anotar los parámetros que se prueban, la configuración elegida y los
 detalles de entrenamiento. Si se usa validación cruzada, el vectorizador y las
@@ -234,19 +270,30 @@ todas las épocas ejecutadas para las dos configuraciones, no solo la ganadora.
 
 | Modelo | Nivel | Accuracy val (IC 95 %) | Macro-F1 val (IC 95 %) |
 | --- | ---: | --- | --- |
-| BERT fine-tuning, tasa 3e-5 (elegida) | 2 | 0,585 (0,575–0,594) | 0,370 (0,358–0,380) |
-| BERT fine-tuning, tasa 2e-5 | 2 | 0,573 (0,562–0,581) | 0,338 (0,328–0,347) |
+| **SciBERT con pesos de clase, 4 épocas (elegido)** | 2 | 0,588 (0,579–0,598) | 0,479 (0,458–0,496) |
+| BERT con pesos de clase, 4 épocas | 2 | 0,585 (0,575–0,594) | 0,460 (0,441–0,476) |
+| BERT original, tasa 3e-5 | 2 | 0,585 (0,575–0,594) | 0,370 (0,358–0,380) |
+| BERT original, tasa 2e-5 | 2 | 0,573 (0,563–0,581) | 0,338 (0,328–0,347) |
 | Baseline: clase mayoritaria | 2 | 0,108 (0,102–0,114) | 0,005 (0,005–0,005) |
-| BERT fine-tuning, tasa 3e-5 | 1 | 0,715 (0,706–0,724) | 0,676 (0,662–0,689) |
+| **BERT original, tasa 3e-5 (elegido)** | 1 | 0,715 (0,706–0,724) | 0,676 (0,662–0,689) |
+| SciBERT con pesos de clase, 4 épocas | 1 | 0,711 (0,702–0,720) | 0,675 (0,660–0,689) |
 | Baseline: clase mayoritaria | 1 | 0,392 (0,382–0,402) | 0,094 (0,092–0,096) |
 
 Los intervalos son bootstrap con 1.000 remuestreos de los proyectos de validación.
 
-![Curvas de entrenamiento y validación](resultados/graficas/finetuning_bert_n2_lr3e-05_curvas.png)
+![Curvas de SciBERT con pesos, nivel 2](resultados/graficas/finetuning_scibert_n2_lr3e-05_pesos_ep4_curvas.png)
 
-**Lectura de las curvas:** la pérdida de validación baja en las tres épocas y el
-macro-F1 sigue subiendo al final, así que no hay sobreajuste. Con más épocas
-quizá mejorase un poco.
+**Lectura de las curvas (SciBERT con pesos, nivel 2):** el macro-F1 de validación sube en
+las cuatro épocas (0,349 → 0,432 → 0,466 → 0,479) y se conserva la cuarta. La pérdida de validación
+(ponderada) es mínima en la tercera época y sube un poco en la cuarta (1,982 → 1,734 → 1,684 → 1,726): el
+modelo empieza a confiar demasiado en algunas predicciones, pero sigue acertando más clases,
+y el criterio de selección es el macro-F1. Más épocas probablemente ya no compensarían.
+Esta pérdida va ponderada por clase, así que no se compara con la de la versión original:
+
+![Curvas de BERT original, nivel 2](resultados/graficas/finetuning_bert_n2_lr3e-05_curvas.png)
+
+En la versión original, sin pesos, la pérdida de validación bajaba en las tres épocas y el
+macro-F1 seguía subiendo al final.
 
 ### Incertidumbre y criterio para comparar
 
@@ -260,44 +307,51 @@ pareado**: en cada remuestreo, los mismos proyectos para los dos modelos, unidos
 contiene el 0**. Si lo contiene, se informa como empate. Los resultados están en
 `resultados/intervalos_val.csv` y `resultados/diferencias_val.csv`.
 
-### Dónde falla el modelo (finetuning_bert_n2_lr3e-05, validación)
+### Dónde falla el modelo (finetuning_scibert_n2_lr3e-05_pesos_ep4, validación)
 
-![F1 por clase](resultados/graficas/f1_por_clase_finetuning_bert_n2_lr3e-05_val.png)
+![F1 por clase](resultados/graficas/f1_por_clase_finetuning_scibert_n2_lr3e-05_pesos_ep4_val.png)
 
-- **Clases pequeñas:** 9 de las 39 categorías tienen F1 = 0, y todas tienen como mucho
-  39 ejemplos en validación. Son categorías como ingeniería química, ingeniería
-  médica, biotecnología industrial o ciencias veterinarias. El modelo prácticamente no
-  llega a predecirlas, y eso explica que el macro-F1 (0,370) quede tan por debajo de la
-  accuracy (0,585).
+- **Clases pequeñas:** con los pesos de clase, las categorías con F1 = 0 pasan de
+  9 en la versión original a **1**: solo queda *otras ciencias médicas* (código 41), con
+  2 proyectos en validación. Las otras 8 que antes no se predecían nunca
+  (ingeniería química, ingeniería médica, biotecnología industrial, ciencias
+  veterinarias…) ahora tienen F1 entre 0,14 y 0,59. A cambio, las categorías
+  grandes (500 proyectos o más) bajan como mucho 0,021 de F1. Por eso sube
+  el macro-F1 sin que cambie la accuracy. Aun así, el macro-F1 (0,479) queda
+  por debajo de la accuracy (0,588): las categorías con pocos ejemplos siguen
+  siendo las más difíciles.
 
-![Matriz de confusión normalizada](resultados/graficas/confusion_finetuning_bert_n2_lr3e-05_val.png)
+![Matriz de confusión normalizada](resultados/graficas/confusion_finetuning_scibert_n2_lr3e-05_pesos_ep4_val.png)
 
-- **Confusiones entre categorías relacionadas:** el 33,8 % de los errores
+- **Confusiones entre categorías relacionadas:** el 34,8 % de los errores
   cae en una categoría hermana (misma raíz de nivel 1). Si el modelo eligiese la
   categoría equivocada al azar, con la frecuencia con que predice cada una, sería
-  el 21,1 %. Las confusiones más frecuentes son entre medicina
+  el 21,2 %. Las confusiones más frecuentes son entre medicina
   básica, medicina clínica y ciencias biológicas, y entre informática e ingeniería
   eléctrica y electrónica. Varias de estas parejas tienen raíces distintas en EuroSciVoc
   (por ejemplo, informática está en ciencias naturales e ingeniería eléctrica en
   ingeniería), pero sus temas están muy próximos en la práctica.
-- **Ambigüedad de la etiqueta:** el **55,1 % de los errores** consiste
+- **Ambigüedad de la etiqueta:** el **53,9 % de los errores** consiste
   en predecir otra de las categorías válidas del proyecto, que descartamos al quedarnos
   solo con la primera. Si esas predicciones contaran como acierto, la accuracy pasaría
-  de 0,585 a **0,814**. Una parte grande del error medido
+  de 0,588 a **0,810**. Una parte grande del error medido
   se debe, por tanto, a la elección de una sola etiqueta y no a un fallo real del
   modelo, lo que confirma el techo del que habla el enunciado.
 
 Detalle por clase y lista de errores en `resultados/por_clase_*_val.csv` y
-`resultados/errores_*_val.csv`.
+`resultados/errores_*_val.csv` (también los de la versión original, para comparar).
 
 ### Nivel 1: seis categorías (finetuning_bert_n1_lr3e-05, validación)
 
-Se repitió la mejor configuración (tasa 3e-5) con las 6 raíces de EuroSciVoc.
+Se repitió la mejor configuración (tasa 3e-5) con las 6 raíces de EuroSciVoc. También se
+probó en nivel 1 la mejor de las mejoras (SciBERT con pesos de clase): empata con el BERT
+original (accuracy 0,711 frente a 0,715; macro-F1 0,675 frente a 0,676;
+diferencias no significativas), así que en nivel 1 se mantiene el original.
 
 ![Curvas nivel 1](resultados/graficas/finetuning_bert_n1_lr3e-05_curvas.png)
 
-- El macro-F1 pasa de 0,370 (39 clases) a **0,676** (6 clases), y la
-  accuracy de 0,585 a **0,715**. Con categorías más amplias hay muchos
+- Frente al modelo elegido de nivel 2, el macro-F1 pasa de 0,479 (39 clases) a **0,676** (6 clases), y la
+  accuracy de 0,588 a **0,715**. Con categorías más amplias hay muchos
   más ejemplos por clase y desaparecen las clases casi vacías: el F1 por clase va de
   0,53 (ciencias agrícolas, la raíz más pequeña) a 0,75.
 - La pérdida de validación sube ligeramente en la tercera época (0,809 → 0,762 → 0,796), aunque el
@@ -318,7 +372,8 @@ con el bootstrap pareado descrito arriba. Las tablas completas están en
 
 | Modelo | Nivel 2: accuracy | Nivel 2: macro-F1 | Nivel 1: accuracy | Nivel 1: macro-F1 |
 | --- | ---: | ---: | ---: | ---: |
-| BERT fine-tuning (tasa 3e-5) | 0,585 (0,575–0,594) | 0,370 (0,358–0,380) | 0,715 (0,706–0,724) | 0,676 (0,662–0,689) |
+| **Fine-tuning elegido** (n2: SciBERT con pesos; n1: BERT original) | 0,588 (0,579–0,598) | 0,479 (0,458–0,496) | 0,715 (0,706–0,724) | 0,676 (0,662–0,689) |
+| BERT fine-tuning original (tasa 3e-5, sin pesos) | 0,585 (0,575–0,594) | 0,370 (0,358–0,380) | 0,715 (0,706–0,724) | 0,676 (0,662–0,689) |
 | TF-IDF + regresión logística | 0,491 (0,480–0,500) | 0,395 (0,376–0,412) | 0,665 (0,655–0,674) | 0,626 (0,612–0,638) |
 | Word2Vec + regresión logística | 0,444 (0,434–0,454) | 0,293 (0,280–0,305) | 0,637 (0,627–0,647) | 0,575 (0,558–0,591) |
 | BERT congelado + regresión logística | 0,408 (0,398–0,417) | 0,269 (0,256–0,280) | 0,636 (0,626–0,645) | 0,575 (0,561–0,590) |
@@ -332,20 +387,28 @@ diferencia no contiene el 0.
 
 | Pregunta | Nivel | Δ accuracy (IC 95 %) | ¿Sig.? | Δ macro-F1 (IC 95 %) | ¿Sig.? |
 | --- | ---: | --- | :---: | --- | :---: |
-| BERT: fine-tuning − congelado con reg. logística | 2 | +0,177 (0,166 a 0,187) | Sí | +0,101 (0,087 a 0,115) | Sí |
+| BERT original (sin pesos): fine-tuning − congelado con reg. logística | 2 | +0,177 (0,166 a 0,187) | Sí | +0,101 (0,087 a 0,115) | Sí |
+| BERT: fine-tuning − congelado con reg. logística | 2 | +0,180 (0,169 a 0,192) | Sí | +0,210 (0,189 a 0,229) | Sí |
 | BERT: fine-tuning − congelado con reg. logística | 1 | +0,079 (0,070 a 0,089) | Sí | +0,100 (0,085 a 0,116) | Sí |
-| Extensión: TF-IDF + metadatos − solo TF-IDF | 2 | -0,004 (-0,009 a 0,000) | No | -0,022 (-0,038 a -0,006) | Sí |
-| Fine-tuning − TF-IDF con reg. logística | 2 | +0,094 (0,084 a 0,104) | Sí | -0,026 (-0,042 a -0,005) | Sí |
-| Fine-tuning − TF-IDF con reg. logística | 1 | +0,050 (0,042 a 0,059) | Sí | +0,050 (0,037 a 0,064) | Sí |
-| Fine-tuning: tasa 3e-5 − 2e-5 | 2 | +0,012 (0,007 a 0,018) | Sí | +0,032 (0,023 a 0,040) | Sí |
-| Representación (reg. logística): TF-IDF − BERT congelado | 2 | +0,083 (0,072 a 0,093) | Sí | +0,127 (0,106 a 0,145) | Sí |
+| Extensión: TF-IDF + metadatos − solo TF-IDF | 2 | -0,004 (-0,009 a 0,000) | No | -0,023 (-0,038 a -0,006) | Sí |
+| Fine-tuning − TF-IDF con reg. logística | 2 | +0,098 (0,087 a 0,108) | Sí | +0,083 (0,064 a 0,102) | Sí |
+| Fine-tuning − TF-IDF con reg. logística | 1 | +0,050 (0,042 a 0,059) | Sí | +0,050 (0,038 a 0,064) | Sí |
+| Fine-tuning: SciBERT − BERT (ambos con pesos de clase) | 2 | +0,003 (-0,005 a 0,012) | No | +0,018 (0,002 a 0,034) | Sí |
+| Fine-tuning: tasa 3e-5 − 2e-5 | 2 | +0,012 (0,007 a 0,018) | Sí | +0,031 (0,023 a 0,040) | Sí |
+| Mejora: BERT con pesos − original | 2 | +0,000 (-0,007 a 0,007) | No | +0,091 (0,071 a 0,107) | Sí |
+| Mejora: SciBERT con pesos − original | 2 | +0,003 (-0,005 a 0,012) | No | +0,109 (0,089 a 0,126) | Sí |
+| Mejora: SciBERT con pesos − original | 1 | -0,004 (-0,012 a 0,003) | No | -0,001 (-0,013 a 0,010) | No |
+| Representación (reg. logística): TF-IDF − BERT congelado | 2 | +0,083 (0,072 a 0,093) | Sí | +0,126 (0,106 a 0,146) | Sí |
 | Representación (reg. logística): TF-IDF − BERT congelado | 1 | +0,029 (0,020 a 0,038) | Sí | +0,050 (0,037 a 0,064) | Sí |
 | Representación (reg. logística): TF-IDF − Word2Vec | 2 | +0,047 (0,038 a 0,056) | Sí | +0,102 (0,082 a 0,121) | Sí |
-| Representación (reg. logística): TF-IDF − Word2Vec | 1 | +0,028 (0,019 a 0,036) | Sí | +0,051 (0,036 a 0,065) | Sí |
+| Representación (reg. logística): TF-IDF − Word2Vec | 1 | +0,028 (0,019 a 0,037) | Sí | +0,051 (0,036 a 0,065) | Sí |
 | Representación (reg. logística): Word2Vec − BERT congelado | 2 | +0,036 (0,026 a 0,046) | Sí | +0,024 (0,012 a 0,037) | Sí |
 | Representación (reg. logística): Word2Vec − BERT congelado | 1 | +0,001 (-0,008 a 0,010) | No | -0,001 (-0,017 a 0,015) | No |
-| Word2Vec: red propia − reg. logística | 2 | -0,036 (-0,046 a -0,026) | Sí | +0,021 (0,009 a 0,036) | Sí |
+| Word2Vec: red propia − reg. logística | 2 | -0,036 (-0,046 a -0,027) | Sí | +0,021 (0,009 a 0,036) | Sí |
 | Word2Vec: red propia − reg. logística | 1 | -0,020 (-0,029 a -0,011) | Sí | +0,002 (-0,013 a 0,016) | No |
+
+En las filas "Fine-tuning − …", el fine-tuning es el elegido en cada nivel (SciBERT con
+pesos en nivel 2; BERT original en nivel 1).
 
 **Lectura:**
 
@@ -358,40 +421,45 @@ diferencia no contiene el 0.
   está dentro del ruido. Que BERT congelado quede por detrás de TF-IDF es razonable. La
   media de los vectores de un BERT no adaptado mezcla información general del lenguaje,
   mientras que TF-IDF conserva términos técnicos muy discriminativos para el área científica.
-- **Adaptar BERT compensa.** El fine-tuning mejora a BERT congelado con regresión
-  logística en unos +0,10 de macro-F1 en los dos niveles. Es la mayor ganancia del estudio.
-- **Fine-tuning frente al mejor modelo clásico.** En **nivel 1**, el fine-tuning es mejor
-  que TF-IDF en las dos métricas. En **nivel 2** hay un compromiso: el fine-tuning gana
-  en accuracy (+0,094) pero pierde en macro-F1 (-0,026), y las dos
-  diferencias son significativas. La causa probable es el desbalance. La regresión
-  logística elegida usa `class_weight="balanced"` y solo deja 1 categoría con F1 = 0,
-  mientras que el fine-tuning se entrenó sin ponderar las clases y deja 9 (todas con 39
-  ejemplos o menos en validación). Ponderar la pérdida del fine-tuning sería la mejora
-  natural, si hubiera tiempo de GPU.
+- **Adaptar BERT compensa.** Con el mismo modelo base y sin pesos, el fine-tuning mejora a
+  BERT congelado con regresión logística en +0,101 de macro-F1 en nivel 2 y +0,100 en
+  nivel 1. Con los pesos de clase y SciBERT, la ventaja en nivel 2 llega a +0,210. Es la mayor
+  ganancia del estudio.
+- **Fine-tuning frente al mejor modelo clásico.** El fine-tuning elegido es mejor que
+  TF-IDF con regresión logística **en las dos métricas y en los dos niveles**, con
+  diferencias significativas: en nivel 2, +0,098 de accuracy y +0,083 de macro-F1; en
+  nivel 1, +0,050 y +0,050. La versión original de nivel 2, sin pesos de clase, ganaba
+  en accuracy pero perdía en macro-F1 (−0,026, significativo): dejaba 9 categorías con
+  F1 = 0, frente a 1 de la regresión logística con `class_weight="balanced"`. Ponderar
+  la pérdida del fine-tuning corrigió ese problema, que venía del desbalance y no de la
+  representación.
 - **Red propia frente a regresión logística con Word2Vec.** En nivel 2 la red sube el
   macro-F1 (+0,021) pero baja la accuracy (-0,036), lo que encaja con su
   pérdida ponderada por clases. En nivel 1 el macro-F1 empata (+0,002). La red no aporta
   una mejora clara frente al modelo lineal.
 - **Extensión.** Añadir metadatos a TF-IDF **empeora** el macro-F1 de forma significativa
-  (-0,022), y la accuracy queda empatada (-0,004). Los metadatos solos superan
+  (-0,023), y la accuracy queda empatada (-0,004). Los metadatos solos superan
   al baseline, pero por muy poco: coste, duración o país dicen poco del área científica.
 
 **Análisis de errores comparado** (`resultados/resumen_errores_val.csv`):
 
-| | Fine-tuning, nivel 2 | TF-IDF + reg. log., nivel 2 | Fine-tuning, nivel 1 | TF-IDF + reg. log., nivel 1 |
+| | Fine-tuning elegido, nivel 2 | TF-IDF + reg. log., nivel 2 | Fine-tuning elegido, nivel 1 | TF-IDF + reg. log., nivel 1 |
 | --- | ---: | ---: | ---: | ---: |
-| Errores | 3.982 | 4.885 | 2.735 | 3.214 |
-| Clases con F1 = 0 | 9 | 1 | 0 | 0 |
-| % de errores que son otra categoría válida del proyecto | 55,1 | 51,1 | 62,3 | 61,3 |
-| Accuracy estricta | 0,585 | 0,491 | 0,715 | 0,665 |
-| Accuracy si contara cualquier categoría válida | 0,814 | 0,751 | 0,893 | 0,870 |
-| % de errores entre categorías hermanas | 33,8 | 34,4 | — | — |
-| % esperado si el error fuese al azar | 21,1 | 20,3 | — | — |
+| Errores | 3.949 | 4.885 | 2.735 | 3.214 |
+| Clases con F1 = 0 | 1 | 1 | 0 | 0 |
+| % de errores que son otra categoría válida del proyecto | 53,9 | 51,1 | 62,3 | 61,3 |
+| Accuracy estricta | 0,588 | 0,491 | 0,715 | 0,665 |
+| Accuracy si contara cualquier categoría válida | 0,810 | 0,751 | 0,893 | 0,870 |
+| % de errores entre categorías hermanas | 34,8 | 34,4 | — | — |
+| % esperado si el error fuese al azar | 21,2 | 20,3 | — | — |
 
-Los dos tipos de modelo fallan de forma parecida. Alrededor de la mitad de los errores
-(más del 60 % en nivel 1) son otra categoría válida del proyecto, y un tercio de los
-errores de nivel 2 cae en una categoría hermana, frente a un 20–21 % esperable por
-azar. La ambigüedad de quedarnos con una única etiqueta limita a todos los modelos por igual.
+Los dos tipos de modelo fallan de forma parecida. Con pesos de clase, el fine-tuning ya
+deja tantas categorías sin predecir como la regresión logística (una, la de 2 proyectos
+en validación) y comete casi mil errores menos en nivel 2. Alrededor de la mitad de los
+errores (más del 60 % en nivel 1) son otra categoría válida del proyecto, y un tercio de
+los errores de nivel 2 cae en una categoría hermana, frente a un 20–21 % esperable por
+azar. Las confusiones más frecuentes son las mismas en los dos modelos (medicina básica,
+medicina clínica y ciencias biológicas; informática e ingeniería eléctrica). La ambigüedad de quedarnos con una única etiqueta limita a todos los modelos por igual.
 
 Pendiente:
 
@@ -437,7 +505,7 @@ final de la extensión en test sigue pendiente.
 > revisión por los tres y de confirmar con la evaluación final en test.**
 
 - **El texto basta para predecir el área con bastante acierto, pero hay un techo.** El
-  mejor modelo acierta el 58 % de las 39 categorías de nivel 2 y el 71 % de las 6 de
+  mejor modelo acierta el 59 % de las 39 categorías de nivel 2 y el 71 % de las 6 de
   nivel 1, frente al 11 % y el 39 % de la clase mayoritaria. Más de la mitad de los
   errores son otra categoría válida del proyecto. La elección de una única etiqueta,
   y no solo el modelo, limita la accuracy medible.
@@ -445,18 +513,22 @@ final de la extensión en test sigue pendiente.
   niveles. Word2Vec y BERT congelado quedan por detrás, y su orden entre ellas no es
   estable con la granularidad (empatan en nivel 1). Un BERT sin adaptar, promediado,
   no supera a una representación dispersa bien ajustada.
-- **Modelos.** El fine-tuning de BERT es el modelo con más accuracy en los dos niveles
-  y el de más macro-F1 en nivel 1. En nivel 2, la regresión logística con TF-IDF y pesos
-  de clase le supera en macro-F1, porque trata mejor las categorías pequeñas. La red
+- **Modelos.** El fine-tuning es el mejor modelo en las dos métricas y en los dos
+  niveles, con diferencias significativas frente a TF-IDF con regresión logística. En
+  nivel 2 eso solo ocurrió al ponderar las clases en la pérdida: la primera versión,
+  sin pesos, perdía en macro-F1 frente a TF-IDF. SciBERT, preentrenado con texto
+  científico, añade una mejora pequeña pero significativa (+0,018 de macro-F1). La red
   propia no mejora con claridad a la regresión logística.
 - **Desbalance.** Es la limitación principal. Varias categorías tienen menos de 40
   ejemplos en validación, y los modelos que no ponderan las clases no llegan a
-  predecirlas. Ponderar o equilibrar las clases cambia la accuracy por macro-F1, y la
-  métrica elegida decide qué modelo parece mejor.
+  predecirlas. En la regresión logística, ponderar cambia accuracy por macro-F1; en el
+  fine-tuning, la ponderación suavizada (raíz de los pesos) sube el macro-F1 en
+  +0,091 sin perder accuracy. Aun así, la categoría más pequeña (2 proyectos en
+  validación) sigue sin acertarse.
 - **Extensión.** Los metadatos administrativos (coste, duración, países) aportan muy
   poco y, combinados con TF-IDF, empeoran ligeramente el macro-F1.
-- **Limitaciones.** Hiperparámetros elegidos con validación, con búsquedas pequeñas por el
-  coste de GPU; un único reparto con una sola semilla; resultados de validación, que
+- **Limitaciones.** Hiperparámetros y mejoras elegidos con validación, con búsquedas
+  pequeñas por el coste de GPU; un único reparto con una sola semilla; resultados de validación, que
   pueden ser algo optimistas para las configuraciones elegidas; y etiquetas en parte
   generadas automáticamente y revisadas por expertos.
 
@@ -508,7 +580,10 @@ cada miembro y las diapositivas. La presentación y defensa son individuales.
 - Devlin, J., Chang, M.-W., Lee, K. y Toutanova, K. (2019). *BERT: Pre-training of Deep
   Bidirectional Transformers for Language Understanding*. NAACL-HLT. Modelo
   `bert-base-uncased` y rangos de hiperparámetros para el fine-tuning.
+- Beltagy, I., Lo, K. y Cohan, A. (2019). *SciBERT: A Pretrained Language Model for
+  Scientific Text*. EMNLP-IJCNLP. Modelo `allenai/scibert_scivocab_uncased`.
 - Biblioteca Hugging Face Transformers (`AutoModel`, `AutoModelForSequenceClassification`, `Trainer`).
+- GPU de Google Colab (versión original del fine-tuning) y de Kaggle (mejoras).
 - Sara utilizó un asistente de IA (Claude, de Anthropic) como ayuda para preparar y
   revisar el código y los textos de su parte. Todos los resultados proceden de
   ejecuciones reales, registradas en `resultados/`.

@@ -1,3 +1,5 @@
-experimento,nivel,learning_rate,epocas,batch,max_len,mejor_checkpoint,val_accuracy,val_macro_f1,minutos,gpu,torch,transformers,semilla
-finetuning_bert_n2_lr2e-05,2,2e-05,3,16,512,/content/checkpoints/finetuning_bert_n2_lr2e-05/checkpoint-3600,0.5725453408380238,0.3380729772428865,29.5,Tesla T4,2.14.1+cu130,5.22.1,42
-finetuning_bert_n2_lr3e-05,2,3e-05,3,16,512,/content/checkpoints/finetuning_bert_n2_lr3e-05/checkpoint-3600,0.5849489264123411,0.3695605365709178,32.0,Tesla T4,2.14.1+cu130,5.22.1,42
+experimento,nivel,learning_rate,epocas,batch,max_len,mejor_checkpoint,val_accuracy,val_macro_f1,minutos,gpu,torch,transformers,semilla,modelo_base,pesos_clase
+finetuning_bert_n2_lr2e-05,2,2e-05,3,16,512,/content/checkpoints/finetuning_bert_n2_lr2e-05/checkpoint-3600,0.5725453408380238,0.3380729772428865,29.5,Tesla T4,2.14.1+cu130,5.22.1,42,,
+finetuning_bert_n2_lr3e-05,2,3e-05,3,16,512,/content/checkpoints/finetuning_bert_n2_lr3e-05/checkpoint-3600,0.5849489264123411,0.3695605365709178,32.0,Tesla T4,2.14.1+cu130,5.22.1,42,,
+finetuning_bert_n2_lr3e-05_pesos_ep4,2,3e-05,4,16,512,/tmp/checkpoints/finetuning_bert_n2_lr3e-05_pesos_ep4/checkpoint-4800,0.5849489264123411,0.4600898194257867,35.7,Tesla T4,2.11.0+cu130,5.20.2,42,bert-base-uncased,raiz
+finetuning_scibert_n2_lr3e-05_pesos_ep4,2,3e-05,4,16,512,/tmp/checkpoints/finetuning_scibert_n2_lr3e-05_pesos_ep4/checkpoint-4800,0.5883885761934542,0.478512099109751,34.1,Tesla T4,2.11.0+cu130,5.20.2,42,allenai/scibert_scivocab_uncased,raiz

@@ -3,9 +3,9 @@ Representación (reg. logística): TF-IDF − Word2Vec,2,izan_lr_tfidf_n2,izan_l
 Representación (reg. logística): TF-IDF − BERT congelado,2,izan_lr_tfidf_n2,izan_lr_bert_n2,0.0828,"(0.0724, 0.0927)",True,0.1265,"(0.1059, 0.1455)",True
 Representación (reg. logística): Word2Vec − BERT congelado,2,izan_lr_word2vec_n2,izan_lr_bert_n2,0.0356,"(0.026, 0.0456)",True,0.0244,"(0.0118, 0.0372)",True
 Word2Vec: red propia − reg. logística,2,izan_mlp_word2vec_n2,izan_lr_word2vec_n2,-0.0363,"(-0.0457, -0.0265)",True,0.0211,"(0.0087, 0.0358)",True
-BERT: fine-tuning − congelado con reg. logística,2,finetuning_bert_n2_lr3e-05,izan_lr_bert_n2,0.1769,"(0.1661, 0.187)",True,0.1007,"(0.0872, 0.1152)",True
-Fine-tuning − TF-IDF con reg. logística,2,finetuning_bert_n2_lr3e-05,izan_lr_tfidf_n2,0.0941,"(0.0839, 0.104)",True,-0.0258,"(-0.0421, -0.005)",True
-Fine-tuning − baseline,2,finetuning_bert_n2_lr3e-05,baseline_mayoritaria_n2,0.4767,"(0.465, 0.488)",True,0.3645,"(0.3527, 0.375)",True
+BERT: fine-tuning − congelado con reg. logística,2,finetuning_scibert_n2_lr3e-05_pesos_ep4,izan_lr_bert_n2,0.1803,"(0.1693, 0.1917)",True,0.2096,"(0.1886, 0.2289)",True
+Fine-tuning − TF-IDF con reg. logística,2,finetuning_scibert_n2_lr3e-05_pesos_ep4,izan_lr_tfidf_n2,0.0976,"(0.0872, 0.1077)",True,0.0831,"(0.0642, 0.102)",True
+Fine-tuning − baseline,2,finetuning_scibert_n2_lr3e-05_pesos_ep4,baseline_mayoritaria_n2,0.4801,"(0.4688, 0.491)",True,0.4735,"(0.4534, 0.4905)",True
 Representación (reg. logística): TF-IDF − Word2Vec,1,izan_lr_tfidf_n1,izan_lr_word2vec_n1,0.0281,"(0.0193, 0.0365)",True,0.0509,"(0.0356, 0.0652)",True
 Representación (reg. logística): TF-IDF − BERT congelado,1,izan_lr_tfidf_n1,izan_lr_bert_n1,0.0293,"(0.0199, 0.0384)",True,0.0502,"(0.0367, 0.0638)",True
 Representación (reg. logística): Word2Vec − BERT congelado,1,izan_lr_word2vec_n1,izan_lr_bert_n1,0.0011,"(-0.0076, 0.0096)",False,-0.0007,"(-0.0168, 0.0149)",False
@@ -13,6 +13,11 @@ Word2Vec: red propia − reg. logística,1,izan_mlp_word2vec_n1,izan_lr_word2vec
 BERT: fine-tuning − congelado con reg. logística,1,finetuning_bert_n1_lr3e-05,izan_lr_bert_n1,0.0792,"(0.07, 0.0888)",True,0.1004,"(0.0851, 0.1159)",True
 Fine-tuning − TF-IDF con reg. logística,1,finetuning_bert_n1_lr3e-05,izan_lr_tfidf_n1,0.0499,"(0.0415, 0.0588)",True,0.0502,"(0.0375, 0.0635)",True
 Fine-tuning − baseline,1,finetuning_bert_n1_lr3e-05,baseline_mayoritaria_n1,0.3233,"(0.3096, 0.336)",True,0.582,"(0.5676, 0.5953)",True
+Mejora del fine-tuning: finetuning_bert_n2_lr3e-05_pesos_ep4 − original,2,finetuning_bert_n2_lr3e-05_pesos_ep4,finetuning_bert_n2_lr3e-05,0.0,"(-0.0066, 0.0069)",False,0.0905,"(0.0713, 0.1071)",True
+Mejora del fine-tuning: finetuning_scibert_n2_lr3e-05_pesos_ep4 − original,2,finetuning_scibert_n2_lr3e-05_pesos_ep4,finetuning_bert_n2_lr3e-05,0.0034,"(-0.0052, 0.012)",False,0.109,"(0.0886, 0.1257)",True
+Mejora del fine-tuning: finetuning_scibert_n1_lr3e-05_pesos_ep4 − original,1,finetuning_scibert_n1_lr3e-05_pesos_ep4,finetuning_bert_n1_lr3e-05,-0.0044,"(-0.0116, 0.0027)",False,-0.001,"(-0.0126, 0.0104)",False
+Fine-tuning: SciBERT − BERT (ambos con pesos de clase),2,finetuning_scibert_n2_lr3e-05_pesos_ep4,finetuning_bert_n2_lr3e-05_pesos_ep4,0.0034,"(-0.0045, 0.0123)",False,0.0184,"(0.0024, 0.0344)",True
+BERT original (sin pesos): fine-tuning − congelado con reg. logística,2,finetuning_bert_n2_lr3e-05,izan_lr_bert_n2,0.1769,"(0.1661, 0.187)",True,0.1007,"(0.0872, 0.1152)",True
 Fine-tuning: tasa 3e-5 − 2e-5,2,finetuning_bert_n2_lr3e-05,finetuning_bert_n2_lr2e-05,0.0124,"(0.0073, 0.0176)",True,0.0315,"(0.0228, 0.0402)",True
 Extensión: TF-IDF + metadatos − solo TF-IDF,2,izan_lr_tfidf_metadatos_n2,izan_lr_tfidf_n2,-0.0045,"(-0.0092, 0.0002)",False,-0.0225,"(-0.0384, -0.0058)",True
 Extensión: solo metadatos − baseline,2,izan_lr_metadatos_n2,baseline_mayoritaria_n2,0.0264,"(0.0196, 0.0324)",True,0.0196,"(0.0181, 0.0211)",True
