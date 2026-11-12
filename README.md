@@ -47,29 +47,116 @@ base; las salidas actuales de los cuadernos 02 y 03 corresponden a las ejecucion
 registradas en resultados/.
 
 ## Problema y datos
+Durante la preparación del conjunto de datos se analizaron los valores ausentes y la disponibilidad de las etiquetas científicas EuroSciVoc.
 
-El conjunto original contiene 35.378 proyectos H2020. Utilizamos `summary` como
-entrada del proyecto básico y construimos la etiqueta con `euroSciVocCode` y el
-catálogo `SciVocCodes.xlsx`.
+El conjunto original contiene 35.378 proyectos H2020. Utilizamos `summary` como entrada del proyecto básico y construimos la etiqueta con `euroSciVocCode` y el catálogo `SciVocCodes.xlsx`.
 
-Para cada proyecto recorremos sus códigos en el orden disponible y elegimos el
-primero cuyo camino tenga una categoría de nivel 2. Guardamos esa categoría y su
-raíz de nivel 1. Descartamos proyectos sin una categoría válida.
+Para cada proyecto recorremos sus códigos en el orden disponible y elegimos el primero cuyo camino tenga una categoría de nivel 2. Guardamos esa categoría y su raíz de nivel 1. Descartamos proyectos sin una categoría válida.
 
-La preparación actual conserva 31.982 proyectos (90,40 %), con 39 categorías de
-nivel 2 y 6 de nivel 1. El reparto guardado contiene 19.189 proyectos de
-entrenamiento, 9.594 de validación y 3.199 de test.
+La preparación actual conserva 31.982 proyectos (90,40 %), con 39 categorías de nivel 2 y 6 de nivel 1. El reparto guardado contiene 19.189 proyectos de entrenamiento, 9.594 de validación y 3.199 de test.
 
-**Pendiente:** explicar la diferencia entre el porcentaje conservado que se
-obtiene con la preparación actual y el 90,31 % aproximado indicado en el
-enunciado. No se ha modificado la regla para forzar ese porcentaje.
+**Comprobación del filtrado de proyectos:** Se ha revisado la diferencia entre el porcentaje de proyectos conservados por nuestra implementación (90,40 %) y el valor aproximado del 90,31 % indicado en el enunciado.
+De los 35.378 proyectos originales:
+- 3.326 proyectos no contienen información en euroSciVocCode.
+- 32.052 proyectos contienen al menos un código EuroSciVoc.
+- De estos, 70 proyectos adicionales se descartan porque sus códigos únicamente permiten identificar categorías de primer nivel, sin alcanzar una categoría válida de segundo nivel.
+- Finalmente, se conservan 31.982 proyectos, equivalentes al 90,40 % del conjunto original.
 
-El análisis exploratorio incluye valores ausentes, clases y desbalance, un
-clasificador que siempre predice la clase mayoritaria, longitud de resúmenes,
-proyectos por año y país, palabras frecuentes y ejemplos de proyectos.
+Se ha comprobado que todos los códigos utilizados existen en el catálogo EuroSciVoc y que los 70 proyectos descartados no contienen ninguna categoría válida de segundo nivel. Por tanto, el procedimiento implementado sigue los criterios establecidos en el enunciado.
 
-**Pendiente:** incluir aquí las figuras y explicar las observaciones principales.
-Las gráficas deben poder verse en este README sin ejecutar los cuadernos.
+También se ha verificado que las particiones de entrenamiento, validación y prueba no presentan proyectos repetidos entre conjuntos, garantizando que los 31.982 proyectos son únicos.
+
+## Análisis exploratorio de datos (EDA):
+Se ha realizado un análisis exploratorio para estudiar las principales características del conjunto de datos, incluyendo valores ausentes, distribución de categorías, desequilibrio entre clases, longitud de los resúmenes, evolución temporal, distribución geográfica y vocabulario utilizado.
+
+### Distribución de las categorías científicas
+Los proyectos se distribuyen entre 6 categorías científicas de primer nivel y 39 categorías de segundo nivel.
+
+La distribución de los proyectos entre las 39 categorías científicas de nivel 2 muestra un claro desequilibrio entre clases (ver siguiente figura).
+
+<img width="1389" height="589" alt="image" src="https://github.com/user-attachments/assets/15506219-e65d-47d4-9128-65dc39f88d1a" />
+
+Las categorías más frecuentes son Basic medicine (3.464 proyectos), Physical sciences (2.912 proyectos) y Computer and information sciences (2.613 proyectos). En cambio, otras categorías cuentan con un número muy reducido de ejemplos.
+
+Este desequilibrio puede afectar al entrenamiento de los clasificadores, ya que los modelos pueden aprender a predecir mejor las categorías mayoritarias y presentar dificultades para identificar las minoritarias. Por este motivo, se utilizan dos métricas de evaluación:
+- **Accuracy**: mide la proporción total de predicciones correctas, pero puede ofrecer resultados elevados cuando el modelo favorece las clases mayoritarias.
+- **Macro-F1**: calcula el F1 de cada categoría y obtiene su media sin ponderar por el número de proyectos, dando la misma importancia a las clases mayoritarias y minoritarias.
+
+Por tanto, macro-F1 se utiliza como métrica principal para comparar los modelos, mientras que accuracy se emplea como medida complementaria del rendimiento global.
+
+También se han representado las diez categorías de segundo nivel con mayor número de proyectos mediante un gráfico circular. Los porcentajes de este gráfico corresponden únicamente a las diez categorías seleccionadas.
+
+<img width="932" height="606" alt="image" src="https://github.com/user-attachments/assets/36ca298a-7f9e-4908-b867-f19d9effb6ce" />
+
+### Longitud de los resúmenes
+Se ha analizado la longitud de los resúmenes para conocer la cantidad de información textual disponible para los modelos.
+
+<img width="989" height="490" alt="image" src="https://github.com/user-attachments/assets/d86f9a4f-3011-4e22-8e48-beae98a7fb8c" />
+
+La longitud media es de aproximadamente 265 palabras, mientras que la mediana es de 276 palabras.
+Estos resultados muestran que los proyectos suelen disponer de resúmenes relativamente extensos, lo que permite utilizar técnicas de representación textual como TF-IDF, Word2Vec y BERT. Sin embargo, las diferencias de longitud entre documentos pueden influir en las representaciones obtenidas.
+
+### Distribución temporal de los proyectos
+Se ha estudiado la distribución de los proyectos según su año de inicio.
+El año 2019 presenta el mayor número de proyectos, con 4.799 registros.
+<img width="989" height="490" alt="image" src="https://github.com/user-attachments/assets/d8ce5c65-b973-4654-a696-59647d5a09d1" />
+
+La distribución temporal permite observar cómo varía el número de proyectos registrados a lo largo del periodo analizado.
+
+### Distribución geográfica
+Se ha analizado la distribución de los proyectos según el país coordinador.
+<img width="989" height="489" alt="image" src="https://github.com/user-attachments/assets/6d942e50-396a-4f1b-9453-d97d5b701e38" />
+
+Los países con mayor número de proyectos son:
+- Reino Unido: 5.027 proyectos.
+- España: 3.928 proyectos.
+- Alemania: 3.464 proyectos.
+
+Estos resultados muestran una concentración importante de proyectos en determinados países europeos.
+
+### Análisis de palabras frecuentes
+Se ha estudiado el vocabulario de los resúmenes para identificar los términos más habituales en las descripciones de los proyectos.
+
+Entre las palabras frecuentes aparecen términos como *project, new, research, based y data*, relacionados con el carácter científico y tecnológico del conjunto de datos.
+
+Se han generado dos visualizaciones: un gráfico de las palabras más frecuentes y una nube de palabras. Estas visualizaciones permiten conocer las características generales del vocabulario y observar la presencia de términos comunes en numerosos proyectos.
+
+<img width="989" height="690" alt="image" src="https://github.com/user-attachments/assets/71f6cd1a-9d08-4d59-aabb-e76866346f47" />
+
+<img width="944" height="504" alt="image" src="https://github.com/user-attachments/assets/1bd73cda-1363-4453-938a-c05e629d2cc0" />
+
+
+### Clasificador de referencia (Baseline)
+Para establecer un punto de comparación inicial, se ha implementado un clasificador que predice siempre la categoría más frecuente del conjunto de entrenamiento, utilizando DummyClassifier con la estrategia most_frequent.
+
+En el conjunto de validación, para la clasificación de nivel 2, se han obtenido los siguientes resultados:
+<img width="687" height="135" alt="image" src="https://github.com/user-attachments/assets/6670ed0c-bb0e-4861-95fc-59092bbeb245" />
+
+La exactitud del 10,83 % refleja la proporción de proyectos pertenecientes a la categoría mayoritaria en validación. Sin embargo, el valor de macro-F1 es muy reducido, ya que el clasificador no consigue identificar correctamente las demás categorías.
+
+Estos resultados evidencian el desequilibrio existente entre las clases y muestran que predecir siempre la categoría mayoritaria no es una estrategia adecuada para este problema.
+
+Por tanto, el baseline servirá como punto de referencia para comparar el rendimiento de los modelos basados en TF-IDF, Word2Vec y BERT, que deberán superar estos valores para demostrar una mejora en la clasificación.
+
+La evaluación sobre el conjunto de test se reserva para la fase final, una vez seleccionados los modelos y sus hiperparámetros mediante el conjunto de validación. De esta forma, se evita utilizar los datos de prueba durante la toma de decisiones y se obtiene una evaluación final independiente.
+
+### Conclusiones del análisis exploratorio
+El análisis exploratorio permite extraer las siguientes conclusiones:
+
+**1. Desequilibrio entre categorías**: las 39 categorías de segundo nivel presentan frecuencias diferentes, lo que puede dificultar la clasificación de las clases minoritarias. Por ello, se utiliza macro-F1 para complementar la accuracy.
+
+**2. Disponibilidad de información textual**: los resúmenes contienen una cantidad considerable de texto, lo que permite aplicar diferentes técnicas de representación y clasificación automática.
+
+**3. Distribución temporal y geográfica**: el número de proyectos varía según el año y el país coordinador, con una mayor representación de determinados países europeos.
+
+**4. Vocabulario científico**: los resúmenes presentan términos frecuentes relacionados con la investigación, la innovación y el desarrollo tecnológico. Esto hace necesario utilizar representaciones que permitan distinguir los términos más informativos de cada categoría.
+
+**5. Necesidad de modelos más avanzados**: el clasificador de clase mayoritaria obtiene un rendimiento muy limitado, especialmente en macro-F1, por lo que resulta necesario evaluar modelos basados en TF-IDF, Word2Vec y BERT.
+
+En conclusión, el EDA permite comprender las características del problema y proporciona una base para interpretar los resultados de los modelos de clasificación.
+
+Todas las gráficas se encuentran disponibles en resultados/graficas/ y pueden visualizarse directamente desde este README sin necesidad de ejecutar los cuadernos.
+
 
 ## Método
 
@@ -109,6 +196,35 @@ con validación; el test se reserva para el final.
   tardó 16,5 minutos en una GPU T4 (configuración en
   `resultados/bert_congelado_config.json`). Los vectores se guardan en
   `datos/cache/bert.joblib`, fuera de GitHub, con una huella que comprueba los proyectos y su orden.
+
+### Resultados de TF-IDF y Word2Vec
+Se han generado las representaciones TF-IDF y Word2Vec utilizando los resúmenes preprocesados de los proyectos y las particiones compartidas.
+
+El vocabulario de TF-IDF y los embeddings de Word2Vec se han aprendido exclusivamente con el conjunto de entrenamiento, evitando utilizar información de validación o prueba durante su construcción.
+
+Las dimensiones obtenidas son:
+
+<img width="400" height="206" alt="image" src="https://github.com/user-attachments/assets/866bd283-c943-4a51-9f9a-7668272132b6" />
+
+TF-IDF representa cada proyecto mediante un vector disperso de 10.000 características, mientras que Word2Vec utiliza vectores densos de 300 dimensiones, obtenidos promediando las representaciones de las palabras conocidas.
+
+#### Análisis de palabras fuera del vocabulario (OOV)
+Se ha analizado la proporción de palabras que no aparecen en el vocabulario aprendido por Word2Vec.
+
+<img width="592" height="117" alt="image" src="https://github.com/user-attachments/assets/1702a04e-3e23-4942-9055-c3d2cc2b78d0" />
+
+Los porcentajes OOV son relativamente bajos, lo que indica que el vocabulario aprendido permite representar la mayoría de los tokens de los documentos.
+
+En validación y prueba el porcentaje OOV es superior porque pueden aparecer términos no presentes en el conjunto de entrenamiento.
+
+Se ha identificado un documento de validación sin palabras reconocidas por Word2Vec. Para mantener las dimensiones de las matrices, se representa mediante un vector de 300 ceros.
+
+#### Limitaciones de las representaciones
+TF-IDF permite identificar términos relevantes, pero no representa directamente las relaciones semánticas entre palabras.
+
+Word2Vec captura relaciones entre términos mediante embeddings, aunque el promedio de vectores puede perder información sobre el orden de las palabras y el contexto específico del documento.
+
+Además, las palabras fuera del vocabulario no contribuyen a la representación Word2Vec, lo que puede provocar pérdida de información en determinados proyectos.
 
 ### Modelos
 
