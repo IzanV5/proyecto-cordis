@@ -1,0 +1,30 @@
+{
+  "fecha": "2026-11-18",
+  "criterio": "Configuraciones elegidas con validación antes de consultar test",
+  "configuraciones": "1edcffc7215a86f7d4bf44d27ea5343ae9ee74033758e22151d64998bb870d58",
+  "particiones": "eee6ff1c9557c99f6382924e0b9f1c0876ea8bba3e6fd138c8916f3474795458",
+  "representaciones": {
+    "tfidf": "3b5fc021bc0b3be5dbc41cb58c802bd709f1b11ebcf11efa96e68c8f89bf0be7",
+    "word2vec": "202356d4427cf9ddd56ba67a69f3a1859d4574c22f2766e4fb11dce375140b00",
+    "bert": "6aa7d0f064d50cb07002794eadc36f28d841e98d37737e10de16562ef264be7a"
+  },
+  "modelos": {
+    "izan_lr_tfidf_n2.joblib": "dfc81d010a088d9264a25ea0a795603d8ad9c75b1f7aaa86c92262965fd2157f",
+    "izan_lr_word2vec_n2.joblib": "52156a50089bb2d0983f32bf8b4b9de6542075884f934dfb3a5323f9c618fb1e",
+    "izan_lr_bert_n2.joblib": "f50fea8376260471f55ae75c464e10cc71770e6eda139c5af261c8325403a2c6",
+    "izan_lr_tfidf_n1.joblib": "119b6e24c43bb9d63500cf8cbdec48a56f9cda38331f931915f7c077b8c48b58",
+    "izan_lr_word2vec_n1.joblib": "74bf94368bced0b308695952e0d982bc5f8641a87e1598eba9730671bb4a1714",
+    "izan_lr_bert_n1.joblib": "f0e46432f0da73a8081b70d4a0db4a3e4b8b28a947f625e85fca203b46bab893",
+    "izan_mlp_word2vec_n2.joblib": "4ecc40dbaacb1c5f0f1e9d54983bda2e1881a322bf90ba3947f80295e3b36080",
+    "izan_mlp_word2vec_n2.pt": "d3eceb666c0d3186c9cb86603403565abaec95f6aa27e65b683e133490f23fe0",
+    "izan_mlp_word2vec_n1.joblib": "f4398bc4e72f28e47b9516d156066e0f492adbd89d280952df9217eb89bb3819",
+    "izan_mlp_word2vec_n1.pt": "c7f3feab120632341a1da5b52a679a7b6f4c858a1952afdef8c1d667d5860ce8",
+    "izan_lr_metadatos_n2.joblib": "1d2d2cfaec0f98d75262d100544e5f937d3b8d0028f11e504e5e23ca4247ecba",
+    "izan_lr_tfidf_metadatos_n2.joblib": "2d6007d59938ef23f3275df27ea28a6fec49d2e38777709f883e41cd9c070d05",
+    "preprocesador_metadatos.joblib": "a3a82ca06b5b383a99bdfd5f0855e7ee0dc3edc7096f9e9b8065d00614bd5e22"
+  },
+  "mejores_basicos_por_validacion": {
+    "1": "izan_lr_tfidf_n1",
+    "2": "izan_lr_tfidf_n2"
+  }
+}

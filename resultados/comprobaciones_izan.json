@@ -1,0 +1,11 @@
+{
+  "fecha": "2026-11-18",
+  "modelos": 10,
+  "filas_metricas": 20,
+  "proyectos_validacion": 9594,
+  "proyectos_test": 3199,
+  "formato_sara": true,
+  "metricas_recalculadas": true,
+  "identificadores_y_etiquetas": true,
+  "sin_ajuste_durante_test": true
+}

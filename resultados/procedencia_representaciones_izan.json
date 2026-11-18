@@ -1,0 +1,24 @@
+{
+  "fecha_comprobacion": "2026-11-18",
+  "archivo": "resultados.zip",
+  "sha256_zip": "14991a8fce7e74bf55b2b2badefe9cbbb092b2aecf98286a8f2c0934235deae8",
+  "representaciones": {
+    "tfidf": {
+      "origen": "resultados/Monica_tfidf.joblib",
+      "destino": "datos/cache/tfidf.joblib",
+      "sha256": "3b5fc021bc0b3be5dbc41cb58c802bd709f1b11ebcf11efa96e68c8f89bf0be7",
+      "identica_a_la_usada_en_validacion": true
+    },
+    "word2vec": {
+      "origen": "resultados/Monica_word2vec.joblib",
+      "destino": "datos/cache/word2vec.joblib",
+      "sha256": "202356d4427cf9ddd56ba67a69f3a1859d4574c22f2766e4fb11dce375140b00",
+      "identica_a_la_usada_en_validacion": true
+    },
+    "bert": {
+      "origen": "Caché entregada por Sara",
+      "destino": "datos/cache/bert.joblib",
+      "sha256": "6aa7d0f064d50cb07002794eadc36f28d841e98d37737e10de16562ef264be7a"
+    }
+  }
+}

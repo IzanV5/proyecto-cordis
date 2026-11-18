@@ -4,9 +4,10 @@ Trabajo de Tratamiento de Datos sobre clasificación de proyectos de investigaci
 Queremos predecir el área científica de un proyecto a partir de su resumen y
 comparar distintas representaciones y modelos.
 
-**Estado:** resultados reales de validación de todos los modelos, con la
-comparación conjunta y su incertidumbre. Las decisiones se han elegido con
-validación. La evaluación final en test sigue pendiente.
+**Estado:** validación y comparación conjunta disponibles. Los diez modelos de
+Izan ya están evaluados en test, con predicciones, incertidumbre, errores y
+extensión. Falta el test del fine-tuning de Sara y reunir la comparación final.
+Las decisiones de los modelos de Izan se cerraron antes de consultar test.
 
 ## Cómo nos repartimos
 
@@ -33,7 +34,7 @@ El reparto detallado, las dependencias y el Gantt están en
 ## Qué hay en cada archivo
 
 - `01_datos_y_representaciones.ipynb`: preparación, exploración, TF-IDF y Word2Vec.
-- `02_modelos_y_extension.ipynb`: clasificadores ajustados, red propia y extensión ejecutados en validación; evaluación final en test desactivada.
+- `02_modelos_y_extension.ipynb`: clasificadores, red propia y extensión ejecutados en validación y test, con salidas guardadas y comprobadas.
 - `03_bert_y_comparacion.ipynb`: BERT congelado, fine-tuning de BERT, tabla común de resultados, incertidumbre y análisis de errores.
 - `funciones.py`: funciones que comparten los cuadernos; responsable único: Izan.
 - `datos/`: Excel y vectores locales; quedan fuera de GitHub.
@@ -233,8 +234,9 @@ Ya está trasladada la primera regresión logística con TF-IDF.
 **Modelos de Izan.** Se ajusta regresión logística con TF-IDF, Word2Vec y BERT
 congelado, manteniendo los mismos proyectos y la misma búsqueda: `C` en
 `[0.5, 2.0]`, con y sin `class_weight="balanced"`. Se usa `lbfgs`, hasta 600
-iteraciones y tolerancia 0,001. Se elige por macro-F1 de validación; no se ha usado
-test. Word2Vec y BERT se estandarizan con train; TF-IDF permanece disperso y con
+iteraciones y tolerancia 0,001. Se elige por macro-F1 de validación;
+test se utiliza después para la evaluación final, sin reajustar. Word2Vec y BERT
+se estandarizan con train; TF-IDF permanece disperso y con
 su normalización del vectorizador. Se repite la búsqueda en niveles 1 y 2.
 
 La red propia de PyTorch usa Word2Vec, una capa oculta ReLU y dropout. Se prueban
@@ -322,9 +324,10 @@ demás transformaciones aprendidas se reajustan dentro de cada partición.
 
 ## Resultados y discusión
 
-> **Estado:** resultados **en validación** de Izan y Sara, con la comparación
-> pareada integrada en el cuaderno 03. Falta la evaluación final en test, que se
-> hará con las decisiones cerradas.
+> **Estado de esta comparación conjunta:** resultados **en validación** de Izan
+> y Sara, con la comparación pareada del cuaderno 03. Más abajo se presenta
+> por separado la evaluación final de Izan en test; falta incorporar el test
+> del fine-tuning.
 
 La tabla común `resultados/metricas.csv` la genera el cuaderno 03. Reúne
 `metricas_monica.csv`, `metricas_izan.csv` y `metricas_sara.csv`, si existen, y el
@@ -613,7 +616,109 @@ Son resultados de validación después de elegir hiperparámetros. La comparaci�
 cuantifica lo obtenido con cada entrada en este protocolo; no demuestra una
 ventaja significativa sin analizar sus diferencias. Las predicciones de las tres
 opciones están disponibles para el bootstrap pareado de Sara. La evaluación
-final de la extensión en test sigue pendiente.
+final de la extensión en test se recoge en el apartado siguiente.
+
+## Evaluación final de los modelos de Izan
+
+El 18 de noviembre se evaluaron las **diez configuraciones elegidas con
+validación** sobre los mismos **3.199 proyectos de test**, sin una nueva búsqueda
+de parámetros ni reentrenar los clasificadores. Se mantienen los modelos ajustados
+con train, sin unir train y validación. La comprobación del ZIP entregado por
+Mónica confirmó que sus matrices coinciden byte a byte con las usadas en el
+ajuste previo; BERT congelado procede de la caché entregada por Sara.
+
+Las configuraciones, particiones, matrices y modelos quedan registrados en
+[`cierre_modelos_izan.json`](resultados/cierre_modelos_izan.json), y la procedencia
+de las matrices en [`procedencia_representaciones_izan.json`](resultados/procedencia_representaciones_izan.json).
+Los intervalos se calculan con bootstrap por proyecto, 1.000 réplicas, semilla 42,
+percentiles 2,5 y 97,5 y las 39 o 6 clases fijas en cada réplica.
+
+| Modelo / entrada | Nivel | Accuracy test | Macro-F1 test | IC 95 % macro-F1 |
+| --- | ---: | ---: | ---: | --- |
+| LR / TF-IDF | 2 | 0.4914 | 0.3992 | [0.3665, 0.4250] |
+| LR / TF-IDF + metadatos | 2 | 0.4892 | 0.3789 | [0.3482, 0.4017] |
+| MLP / Word2Vec | 2 | 0.4029 | 0.3086 | [0.2869, 0.3260] |
+| LR / Word2Vec | 2 | 0.4436 | 0.2907 | [0.2673, 0.3097] |
+| LR / BERT congelado | 2 | 0.3989 | 0.2659 | [0.2427, 0.2848] |
+| LR / Metadatos | 2 | 0.1319 | 0.0256 | [0.0226, 0.0288] |
+| LR / TF-IDF | 1 | 0.6590 | 0.6072 | [0.5853, 0.6297] |
+| LR / Word2Vec | 1 | 0.6486 | 0.5815 | [0.5530, 0.6075] |
+| MLP / Word2Vec | 1 | 0.6155 | 0.5710 | [0.5514, 0.5917] |
+| LR / BERT congelado | 1 | 0.6227 | 0.5564 | [0.5323, 0.5806] |
+
+TF-IDF sigue siendo la representación con mayor macro-F1 usando la misma
+regresión logística, en ambos niveles. En test el orden es TF-IDF, Word2Vec y
+BERT congelado. Este ranking describe los resultados de configuraciones ya
+elegidas; no se usa para cambiar la selección después de consultar test.
+
+![Representaciones en test](resultados/graficas/izan_comparacion_representaciones_test.png)
+
+### Diferencias e incertidumbre
+
+Cada réplica usa los mismos proyectos para los dos modelos comparados. La
+diferencia puntual es la observada en test, A menos B; los intervalos se obtienen
+de las diferencias de cada réplica. Los pares comparados son las tres parejas
+de representaciones en cada nivel, MLP frente a LR con Word2Vec en cada nivel
+y la combinación de metadatos frente a TF-IDF en nivel 2.
+
+| A − B | Nivel | Diferencia macro-F1 | IC 95 % pareado |
+| --- | ---: | ---: | --- |
+| LR tfidf − LR word2vec | 2 | +0.1085 | [+0.0749, +0.1362] |
+| LR tfidf − LR bert | 2 | +0.1333 | [+0.0968, +0.1656] |
+| LR word2vec − LR bert | 2 | +0.0248 | [+0.0006, +0.0495] |
+| MLP word2vec − LR word2vec | 2 | +0.0179 | [-0.0059, +0.0414] |
+| LR tfidf − LR word2vec | 1 | +0.0257 | [-0.0001, +0.0513] |
+| LR tfidf − LR bert | 1 | +0.0508 | [+0.0264, +0.0773] |
+| LR word2vec − LR bert | 1 | +0.0251 | [-0.0014, +0.0521] |
+| MLP word2vec − LR word2vec | 1 | -0.0105 | [-0.0337, +0.0154] |
+| LR tfidf + metadatos − LR tfidf | 2 | -0.0204 | [-0.0417, -0.0016] |
+
+En nivel 1, la diferencia de macro-F1 entre TF-IDF y Word2Vec no queda clara:
+su intervalo incluye cero. Tampoco se confirma una mejora de macro-F1 de la
+red frente a LR con Word2Vec en ninguno de los dos niveles. En nivel 2, la
+combinación de texto y metadatos obtiene un macro-F1 menor que TF-IDF solo.
+
+Un intervalo que incluye cero no permite afirmar una diferencia con este
+procedimiento. Son intervalos sin corrección por comparaciones múltiples, sobre
+un único reparto. El bootstrap no incorpora la variabilidad de repetir el
+entrenamiento y las categorías con muy pocos proyectos tienen estimaciones
+inestables. No se deben comparar estas cifras de test con cifras de validación
+del fine-tuning como si procedieran del mismo conjunto.
+
+### Extensión en test
+
+La entrada combinada obtiene macro-F1 **0,3789**, frente a **0,3992** con TF-IDF
+y **0,0256** con metadatos solos. Añadir los metadatos empleados no mejora
+TF-IDF en este protocolo; el intervalo pareado de su diferencia aparece arriba.
+Los resultados completos están en
+[`extension_izan_test.csv`](resultados/extension_izan_test.csv).
+
+![Extensión en test](resultados/graficas/izan_extension_test.png)
+
+### Errores y categorías alternativas
+
+Se examinan los modelos TF-IDF de ambos niveles, elegidos por macro-F1 de
+validación antes de test. Además de la evaluación oficial de etiqueta única,
+se comprueba cuántos errores corresponden a otra categoría EuroSciVoc válida
+del mismo proyecto. Ese diagnóstico no sustituye la accuracy oficial.
+
+| Nivel | Errores | Errores que son otra categoría válida | Clases con F1 = 0 |
+| ---: | ---: | ---: | ---: |
+| 2 | 1627 | 50.1 % | 2 |
+| 1 | 1091 | 60.0 % | 0 |
+
+![Confusión nivel 2 en test](resultados/graficas/izan_confusion_elegido_n2_test.png)
+
+![Confusión nivel 1 en test](resultados/graficas/izan_confusion_elegido_n1_test.png)
+
+Las predicciones individuales, los informes por clase, los intervalos de
+accuracy y macro-F1 y los errores están en `resultados/`. Se han recalculado las
+métricas a partir de los CSV y comprobado identificadores, etiquetas y orden.
+[`comprobaciones_izan.json`](resultados/comprobaciones_izan.json) resume esas comprobaciones.
+
+Sara ya puede incorporar `metricas_izan.csv` y `predicciones/izan_*_test.csv` al
+cuaderno 03. **Quedan pendientes el test de su fine-tuning y la comparación
+conjunta en test**; este apartado cierra la evaluación de los modelos de Izan.
 
 ## Conclusiones y limitaciones
 
@@ -675,8 +780,22 @@ requiere activar `GENERAR_TODO` en su cuaderno. No hace falta ejecutarlo para
 abrir el proyecto. Para Colab hay que proporcionar los mismos datos,
 `funciones.py` y el CSV de particiones, y situarse en la carpeta del proyecto.
 
-`requirements.txt` es una lista inicial; antes de entregar hay que guardar las
-versiones del entorno con el que se hayan reproducido los experimentos finales.
+`requirements.txt` recoge las dependencias comunes. Las versiones utilizadas
+en los modelos de Izan están guardadas en `resultados/entorno_izan.json`.
+
+El cuaderno 02 está guardado en modo final: `EVALUAR_TEST=True`,
+`SOLO_MODELOS_ELEGIDOS=True`, `FORZAR_ENTRENAMIENTO=False`. Para repetir esa
+evaluación se necesitan las tres matrices en `datos/cache/` y los modelos
+originales en `datos/cache/modelos_izan/`, compartidos fuera de GitHub. Si falta
+un modelo o cambia su configuración, el cuaderno se detiene y no lo reajusta
+durante test. Sara puede leer los CSV sin disponer de esos modelos.
+
+Para reproducir el ajuste desde cero, usar un clon sin modelos guardados y poner
+`EVALUAR_TEST=False` y `SOLO_MODELOS_ELEGIDOS=False`; esto ejecuta entrenamiento
+y validación, omitiendo los apartados finales de test. Se conservan las semillas,
+los parámetros y el reparto. La comparación de esa reproducción con la entrega
+debe hacerse por configuración y métricas, sin sustituir el cierre original ni
+volver a elegir parámetros con el test ya conocido.
 
 ## Organización y entrega
 
@@ -705,4 +824,7 @@ cada miembro y las diapositivas. La presentación y defensa son individuales.
   ejecuciones reales, registradas en `resultados/`.
 - Scikit-learn: regresión logística, preprocesamiento y métricas. PyTorch:
   implementación de la red propia. Gensim y spaCy: Word2Vec y preprocesamiento.
-- Pendiente de completar con las referencias y ayudas utilizadas por el resto del grupo.
+- Izan utilizó ChatGPT como ayuda para completar y revisar el código y la
+  documentación de su parte. Las métricas y figuras proceden de la ejecución
+  real del cuaderno y sus comprobaciones.
+- Pendiente de completar con las ayudas utilizadas por Mónica, si corresponde.

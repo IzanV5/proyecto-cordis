@@ -9,3 +9,13 @@ izan_mlp_word2vec_n2,Word2Vec,Red propia PyTorch,2,val,0.4074421513445904,0.3143
 izan_mlp_word2vec_n1,Word2Vec,Red propia PyTorch,1,val,0.6165311653116531,0.5765621972678016
 izan_lr_metadatos_n2,Metadatos,Regresión logística,2,val,0.134667500521159,0.0246132406001269
 izan_lr_tfidf_metadatos_n2,TF-IDF + metadatos,Regresión logística,2,val,0.4863456326870961,0.3728504979547791
+izan_lr_tfidf_n2,TF-IDF,Regresión logística,2,test,0.4914035636136292,0.3992386280830407
+izan_lr_word2vec_n2,Word2Vec,Regresión logística,2,test,0.4435761175367302,0.2907421316647638
+izan_lr_bert_n2,BERT congelado,Regresión logística,2,test,0.3988746483276024,0.2659318495794506
+izan_lr_tfidf_n1,TF-IDF,Regresión logística,1,test,0.6589559237261644,0.6071995953195443
+izan_lr_word2vec_n1,Word2Vec,Regresión logística,1,test,0.6486402000625195,0.5814974706627473
+izan_lr_bert_n1,BERT congelado,Regresión logística,1,test,0.6226945920600188,0.5564277030681833
+izan_mlp_word2vec_n2,Word2Vec,Red propia PyTorch,2,test,0.4029384182557049,0.3085922799641446
+izan_mlp_word2vec_n1,Word2Vec,Red propia PyTorch,1,test,0.6155048452641451,0.5710385518067704
+izan_lr_metadatos_n2,Metadatos,Regresión logística,2,test,0.1319162238199437,0.0255764370911782
+izan_lr_tfidf_metadatos_n2,TF-IDF + metadatos,Regresión logística,2,test,0.48921537980618945,0.37887456914029205

@@ -1,0 +1,4 @@
+experimento,representacion,modelo,nivel,conjunto,accuracy,macro_f1
+izan_lr_tfidf_n2,TF-IDF,Regresión logística,2,test,0.4914035636136292,0.3992386280830407
+izan_lr_metadatos_n2,Metadatos,Regresión logística,2,test,0.1319162238199437,0.0255764370911782
+izan_lr_tfidf_metadatos_n2,TF-IDF + metadatos,Regresión logística,2,test,0.4892153798061894,0.378874569140292

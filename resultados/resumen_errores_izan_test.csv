@@ -1,0 +1,3 @@
+experimento,nivel,proyectos,errores,accuracy_estricta,porcentaje_errores_otra_categoria_valida,accuracy_cualquier_categoria_valida,porcentaje_errores_misma_raiz,clases_f1_cero
+izan_lr_tfidf_n2,2,3199,1627,0.49140356361362925,50.09219422249539,0.7461706783369804,34.726490473263674,2
+izan_lr_tfidf_n1,1,3199,1091,0.6589559237261644,60.03666361136572,0.8637074085651766,,0
