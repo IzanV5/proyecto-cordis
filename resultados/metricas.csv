@@ -1,4 +1,11 @@
 experimento,representacion,modelo,nivel,conjunto,accuracy,macro_f1,origen
+finetuning_scibert_n2_lr3e-05_pesos_ep4,texto original,SciBERT fine-tuning (pesos de clase),2,test,0.5989371678649578,0.47923039364713715,sara
+izan_lr_tfidf_n2,TF-IDF,Regresión logística,2,test,0.4914035636136292,0.3992386280830407,izan
+izan_lr_tfidf_metadatos_n2,TF-IDF + metadatos,Regresión logística,2,test,0.48921537980618945,0.37887456914029205,izan
+izan_mlp_word2vec_n2,Word2Vec,Red propia PyTorch,2,test,0.4029384182557049,0.3085922799641446,izan
+izan_lr_word2vec_n2,Word2Vec,Regresión logística,2,test,0.4435761175367302,0.2907421316647638,izan
+izan_lr_bert_n2,BERT congelado,Regresión logística,2,test,0.3988746483276024,0.2659318495794506,izan
+izan_lr_metadatos_n2,Metadatos,Regresión logística,2,test,0.1319162238199437,0.0255764370911782,izan
 baseline_mayoritaria_n2,ninguna,clase mayoritaria,2,test,0.1084713973116598,0.0050182943583958,baseline (cuaderno 03)
 finetuning_scibert_n2_lr3e-05_pesos_ep4,texto original,SciBERT fine-tuning (pesos de clase),2,val,0.5883885761934542,0.478512099109751,sara
 finetuning_bert_n2_lr3e-05_pesos_ep4,texto original,BERT fine-tuning (pesos de clase),2,val,0.5849489264123411,0.4600898194257867,sara
@@ -11,6 +18,11 @@ izan_lr_word2vec_n2,Word2Vec,Regresión logística,2,val,0.4437148217636023,0.29
 izan_lr_bert_n2,BERT congelado,Regresión logística,2,val,0.4080675422138837,0.2688846748374155,izan
 izan_lr_metadatos_n2,Metadatos,Regresión logística,2,val,0.134667500521159,0.0246132406001269,izan
 baseline_mayoritaria_n2,ninguna,clase mayoritaria,2,val,0.1082968521992912,0.0050110083026475,baseline (cuaderno 03)
+finetuning_bert_n1_lr3e-05,texto original,BERT fine-tuning,1,test,0.7152235073460457,0.6436216441906755,sara
+izan_lr_tfidf_n1,TF-IDF,Regresión logística,1,test,0.6589559237261644,0.6071995953195443,izan
+izan_lr_word2vec_n1,Word2Vec,Regresión logística,1,test,0.6486402000625195,0.5814974706627473,izan
+izan_mlp_word2vec_n1,Word2Vec,Red propia PyTorch,1,test,0.6155048452641451,0.5710385518067704,izan
+izan_lr_bert_n1,BERT congelado,Regresión logística,1,test,0.6226945920600188,0.5564277030681833,izan
 baseline_mayoritaria_n1,ninguna,clase mayoritaria,1,test,0.3916849015317287,0.0938155136268343,baseline (cuaderno 03)
 finetuning_bert_n1_lr3e-05,texto original,BERT fine-tuning,1,val,0.7149259954138003,0.6758201376710803,sara
 finetuning_scibert_n1_lr3e-05_pesos_ep4,texto original,SciBERT fine-tuning (pesos de clase),1,val,0.7105482593287471,0.6747794464300158,sara

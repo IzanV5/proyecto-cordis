@@ -4,10 +4,9 @@ Trabajo de Tratamiento de Datos sobre clasificación de proyectos de investigaci
 Queremos predecir el área científica de un proyecto a partir de su resumen y
 comparar distintas representaciones y modelos.
 
-**Estado:** validación y comparación conjunta disponibles. Los diez modelos de
-Izan ya están evaluados en test, con predicciones, incertidumbre, errores y
-extensión. Falta el test del fine-tuning de Sara y reunir la comparación final.
-Las decisiones de los modelos de Izan se cerraron antes de consultar test.
+**Estado:** completo. Todas las configuraciones se eligieron con validación y se
+evaluaron una sola vez en test (18/11/2026), con la comparación conjunta, su
+incertidumbre y el análisis de errores. Las conclusiones están al final.
 
 ## Cómo nos repartimos
 
@@ -35,7 +34,7 @@ El reparto detallado, las dependencias y el Gantt están en
 
 - `01_datos_y_representaciones.ipynb`: preparación, exploración, TF-IDF y Word2Vec.
 - `02_modelos_y_extension.ipynb`: clasificadores, red propia y extensión ejecutados en validación y test, con salidas guardadas y comprobadas.
-- `03_bert_y_comparacion.ipynb`: BERT congelado, fine-tuning de BERT, tabla común de resultados, incertidumbre y análisis de errores.
+- `03_bert_y_comparacion.ipynb`: BERT congelado, fine-tuning de BERT y SciBERT, evaluación final del fine-tuning en test, tabla común de resultados, incertidumbre y análisis de errores (guardado con el análisis en test).
 - `funciones.py`: funciones que comparten los cuadernos; responsable único: Izan.
 - `datos/`: Excel y vectores locales; quedan fuera de GitHub.
 - `resultados/`: reparto de proyectos, métricas, predicciones y gráficas.
@@ -229,8 +228,6 @@ Además, las palabras fuera del vocabulario no contribuyen a la representación 
 
 ### Modelos
 
-Ya está trasladada la primera regresión logística con TF-IDF.
-
 **Modelos de Izan.** Se ajusta regresión logística con TF-IDF, Word2Vec y BERT
 congelado, manteniendo los mismos proyectos y la misma búsqueda: `C` en
 `[0.5, 2.0]`, con y sin `class_weight="balanced"`. Se usa `lbfgs`, hasta 600
@@ -318,16 +315,11 @@ algo optimistas; la estimación sin sesgo será la de test. Detalle en
 `resultados/finetuning_busqueda_nivel{1,2}.csv`; historiales completos en
 `resultados/finetuning_*_historial.json`.
 
-Hay que anotar los parámetros que se prueban, la configuración elegida y los
-detalles de entrenamiento. Si se usa validación cruzada, el vectorizador y las
-demás transformaciones aprendidas se reajustan dentro de cada partición.
-
 ## Resultados y discusión
 
-> **Estado de esta comparación conjunta:** resultados **en validación** de Izan
-> y Sara, con la comparación pareada del cuaderno 03. Más abajo se presenta
-> por separado la evaluación final de Izan en test; falta incorporar el test
-> del fine-tuning.
+> Este apartado recoge los resultados **de validación**, con los que se tomaron todas
+> las decisiones. La estimación final está en
+> [Evaluación final en test](#evaluación-final-en-test-comparación-conjunta).
 
 La tabla común `resultados/metricas.csv` la genera el cuaderno 03. Reúne
 `metricas_monica.csv`, `metricas_izan.csv` y `metricas_sara.csv`, si existen, y el
@@ -352,8 +344,8 @@ incorporarse directamente al análisis pareado del cuaderno 03.
 
 La mejor configuración básica de Izan por macro-F1 de validación es
 `izan_lr_tfidf_n2` (0.3954). Esta es una selección sobre
-validación y puede resultar optimista. Las diferencias no se interpretan como
-significativas sin la comparación pareada de Sara y la evaluación final en test.
+validación y puede resultar optimista. Sus diferencias se contrastan con el
+bootstrap pareado en la comparación conjunta, y la estimación final es la de test.
 
 ![Búsqueda de regresión logística](resultados/graficas/izan_validacion_lr_n2.png)
 
@@ -580,11 +572,6 @@ los errores de nivel 2 cae en una categoría hermana, frente a un 20–21 % espe
 azar. Las confusiones más frecuentes son las mismas en los dos modelos (medicina básica,
 medicina clínica y ciencias biológicas; informática e ingeniería eléctrica). La ambigüedad de quedarnos con una única etiqueta limita a todos los modelos por igual.
 
-Pendiente:
-
-- Evaluar en test las configuraciones elegidas, una vez cerradas las decisiones, y repetir
-  con `CONJUNTO = "test"` la tabla, las comparaciones pareadas y el análisis de errores.
-
 ## Extensión
 
 Se compararon regresión logística con solo TF-IDF, solo metadatos y ambas
@@ -617,6 +604,13 @@ cuantifica lo obtenido con cada entrada en este protocolo; no demuestra una
 ventaja significativa sin analizar sus diferencias. Las predicciones de las tres
 opciones están disponibles para el bootstrap pareado de Sara. La evaluación
 final de la extensión en test se recoge en el apartado siguiente.
+
+**Comparación de modelos Transformer (complemento, Sara).** El enunciado propone también
+comparar varios Transformer, incluidos modelos del dominio como SciBERT. En el fine-tuning se
+comparó `bert-base-uncased` con SciBERT, con la misma configuración y los mismos pesos de
+clase: SciBERT mejora el macro-F1 de validación de nivel 2 en +0,018 (IC 95 %: 0,002 a 0,034,
+significativo pero pequeño) sin cambiar la accuracy, y en nivel 1 empata con BERT. Los
+detalles están en el apartado de fine-tuning del método.
 
 ## Evaluación final de los modelos de Izan
 
@@ -716,42 +710,145 @@ accuracy y macro-F1 y los errores están en `resultados/`. Se han recalculado la
 métricas a partir de los CSV y comprobado identificadores, etiquetas y orden.
 [`comprobaciones_izan.json`](resultados/comprobaciones_izan.json) resume esas comprobaciones.
 
-Sara ya puede incorporar `metricas_izan.csv` y `predicciones/izan_*_test.csv` al
-cuaderno 03. **Quedan pendientes el test de su fine-tuning y la comparación
-conjunta en test**; este apartado cierra la evaluación de los modelos de Izan.
+La comparación conjunta en test, con el fine-tuning, está en el apartado siguiente.
+
+## Evaluación final en test: comparación conjunta
+
+**Protocolo.** Con todas las decisiones cerradas (Izan, 18/11/2026; fine-tuning, 11/11/2026),
+cada configuración elegida con validación se evaluó **una sola vez** sobre los mismos
+**3.199 proyectos de test**, sin reentrenar ni cambiar nada. El fine-tuning evaluado es el
+elegido con validación en cada nivel: SciBERT con pesos de clase en nivel 2 y el BERT
+original en nivel 1. Se evaluó en CPU (solo predicción) desde los pesos guardados; antes, el
+cuaderno comprobó que cada modelo cargado repetía el 100 % de sus predicciones guardadas en
+300 proyectos de validación. La tabla, los intervalos y las comparaciones pareadas son las
+mismas que en validación, calculadas por el cuaderno 03 con `CONJUNTO = "test"`
+(`resultados/intervalos_test.csv`, `diferencias_test.csv`, `resumen_errores_test.csv`).
+
+| Modelo | Nivel 2: accuracy | Nivel 2: macro-F1 | Nivel 1: accuracy | Nivel 1: macro-F1 |
+| --- | ---: | ---: | ---: | ---: |
+| **Fine-tuning elegido** (n2: SciBERT con pesos; n1: BERT original) | 0,599 (0,583–0,616) | 0,479 (0,446–0,503) | 0,715 (0,700–0,730) | 0,644 (0,618–0,666) |
+| TF-IDF + regresión logística | 0,491 (0,474–0,509) | 0,399 (0,367–0,425) | 0,659 (0,642–0,675) | 0,607 (0,585–0,630) |
+| Word2Vec + regresión logística | 0,444 (0,425–0,460) | 0,291 (0,267–0,310) | 0,649 (0,632–0,664) | 0,581 (0,553–0,608) |
+| BERT congelado + regresión logística | 0,399 (0,382–0,416) | 0,266 (0,243–0,285) | 0,623 (0,606–0,639) | 0,556 (0,532–0,581) |
+| Word2Vec + red propia (PyTorch) | 0,403 (0,386–0,419) | 0,309 (0,287–0,326) | 0,616 (0,600–0,632) | 0,571 (0,551–0,592) |
+| TF-IDF + metadatos + reg. logística (extensión) | 0,489 (0,471–0,505) | 0,379 (0,348–0,402) | — | — |
+| Solo metadatos + reg. logística (extensión) | 0,132 (0,121–0,144) | 0,026 (0,023–0,029) | — | — |
+| Baseline: clase mayoritaria | 0,108 (0,098–0,119) | 0,005 (0,005–0,005) | 0,392 (0,374–0,409) | 0,094 (0,091–0,097) |
+
+Entre paréntesis, el intervalo del 95 % (bootstrap, 1.000 remuestreos de los proyectos de test).
+
+**¿Qué diferencia es significativa en test?** Con 3.199 proyectos, la mitad del intervalo del
+95 % de una diferencia pareada es, en mediana, de unos **±1,6 puntos de accuracy y
+±2,6 puntos de macro-F1** (hasta ±3,4 en macro-F1). Es decir, en test una
+diferencia de macro-F1 de menos de 2–3 puntos no se puede distinguir del azar del
+muestreo, y así se trata abajo: solo se interpreta lo marcado como significativo.
+
+| Pregunta | Nivel | Δ accuracy (IC 95 %) | ¿Sig.? | Δ macro-F1 (IC 95 %) | ¿Sig.? |
+| --- | ---: | --- | :---: | --- | :---: |
+| BERT: fine-tuning − congelado con reg. logística | 2 | +0,200 (0,182 a 0,220) | Sí | +0,213 (0,178 a 0,245) | Sí |
+| BERT: fine-tuning − congelado con reg. logística | 1 | +0,093 (0,074 a 0,109) | Sí | +0,087 (0,061 a 0,113) | Sí |
+| Extensión: TF-IDF + metadatos − solo TF-IDF | 2 | -0,002 (-0,011 a 0,006) | No | -0,020 (-0,042 a -0,002) | Sí |
+| Fine-tuning − TF-IDF con reg. logística | 2 | +0,108 (0,089 a 0,127) | Sí | +0,080 (0,048 a 0,112) | Sí |
+| Fine-tuning − TF-IDF con reg. logística | 1 | +0,056 (0,039 a 0,072) | Sí | +0,036 (0,012 a 0,057) | Sí |
+| Representación (reg. logística): TF-IDF − BERT congelado | 2 | +0,093 (0,076 a 0,111) | Sí | +0,133 (0,097 a 0,166) | Sí |
+| Representación (reg. logística): TF-IDF − BERT congelado | 1 | +0,036 (0,020 a 0,053) | Sí | +0,051 (0,026 a 0,077) | Sí |
+| Representación (reg. logística): TF-IDF − Word2Vec | 2 | +0,048 (0,032 a 0,065) | Sí | +0,108 (0,075 a 0,136) | Sí |
+| Representación (reg. logística): TF-IDF − Word2Vec | 1 | +0,010 (-0,004 a 0,025) | No | +0,026 (-0,000 a 0,051) | No |
+| Representación (reg. logística): Word2Vec − BERT congelado | 2 | +0,045 (0,028 a 0,062) | Sí | +0,025 (0,001 a 0,050) | Sí |
+| Representación (reg. logística): Word2Vec − BERT congelado | 1 | +0,026 (0,010 a 0,040) | Sí | +0,025 (-0,001 a 0,052) | No |
+| Word2Vec: red propia − reg. logística | 2 | -0,041 (-0,057 a -0,025) | Sí | +0,018 (-0,006 a 0,041) | No |
+| Word2Vec: red propia − reg. logística | 1 | -0,033 (-0,047 a -0,019) | Sí | -0,010 (-0,034 a 0,015) | No |
+
+**Lectura de los resultados de test:**
+
+- **Fine-tuning frente al mejor modelo clásico.** El fine-tuning es mejor que TF-IDF con
+  regresión logística en las dos métricas y en los dos niveles, con diferencias
+  significativas: +0,108 de accuracy y +0,080 de macro-F1 en nivel 2, y +0,056 y +0,036 en
+  nivel 1. Se confirma lo visto en validación.
+- **Adaptar BERT compensa.** Frente a BERT congelado con regresión logística, el fine-tuning
+  gana +0,213 de macro-F1 en nivel 2 y +0,087 en nivel 1. La representación congelada es la
+  peor de las tres; adaptada a la tarea, la mejor de todo el estudio.
+- **Ranking de representaciones (mismo clasificador).** El orden de las estimaciones es el
+  mismo en los dos niveles: TF-IDF, Word2Vec y BERT congelado. En nivel 2 las tres
+  diferencias son significativas. En nivel 1 las distancias se reducen: TF-IDF sigue por
+  encima de BERT congelado, pero en macro-F1 TF-IDF frente a Word2Vec y Word2Vec frente a
+  BERT congelado quedan dentro de la incertidumbre (en accuracy, Word2Vec sí supera a BERT
+  congelado). Por tanto, **el ranking no cambia con la granularidad**:
+  con 6 clases las representaciones se parecen más, sin que ninguna adelante a otra.
+- **Red propia frente a regresión logística (Word2Vec).** La red pierde accuracy en los dos
+  niveles y su macro-F1 empata con el de la regresión logística. No aporta una mejora clara.
+- **Extensión.** Añadir metadatos a TF-IDF baja el macro-F1 en 0,020, en el límite de la
+  significación, y deja la accuracy igual: los metadatos no ayudan.
+- **Validación frente a test.** En nivel 2 el fine-tuning mantiene en test lo estimado en
+  validación (macro-F1 0,479 en los dos). En nivel 1 baja de 0,676 a 0,644, una diferencia
+  del orden de su intervalo de test (±0,024) y que se concentra en la raíz más pequeña,
+  ciencias agrícolas (64 proyectos en test, F1 0,32). Es el optimismo esperable por elegir
+  con validación, sumado al ruido del muestreo, y no cambia ninguna conclusión.
+
+**Análisis de errores en test** (`resultados/resumen_errores_test.csv`):
+
+| | Fine-tuning elegido, nivel 2 | TF-IDF + reg. log., nivel 2 | Fine-tuning elegido, nivel 1 | TF-IDF + reg. log., nivel 1 |
+| --- | ---: | ---: | ---: | ---: |
+| Errores | 1.283 | 1.627 | 911 | 1.091 |
+| Clases con F1 = 0 | 3 | 2 | 0 | 0 |
+| % de errores que son otra categoría válida del proyecto | 51,8 | 50,1 | 60,7 | 60,0 |
+| Accuracy estricta | 0,599 | 0,491 | 0,715 | 0,659 |
+| Accuracy si contara cualquier categoría válida | 0,807 | 0,746 | 0,888 | 0,864 |
+| % de errores entre categorías hermanas | 35,7 | 34,7 | — | — |
+| % esperado si el error fuese al azar | 20,9 | 20,0 | — | — |
+
+![F1 por clase en test](resultados/graficas/f1_por_clase_finetuning_scibert_n2_lr3e-05_pesos_ep4_test.png)
+
+![Matriz de confusión de la mejor configuración en test](resultados/graficas/confusion_finetuning_scibert_n2_lr3e-05_pesos_ep4_test.png)
+
+Los patrones de error se repiten en test. Algo más de la mitad de los errores de nivel 2
+(y el 61 % de los de nivel 1) predicen otra categoría válida del proyecto: si contaran como
+acierto, la accuracy del fine-tuning pasaría de 0,599 a 0,807 en nivel 2 y de 0,715 a 0,888
+en nivel 1. Un 35,7 % de los errores de nivel 2 cae en una categoría hermana, frente al
+20,9 % esperable por azar. Las confusiones más frecuentes son las mismas que en
+validación: ciencias biológicas, medicina básica y medicina clínica entre sí, e ingeniería
+eléctrica y electrónica con informática; en nivel 1, ciencias naturales con ingeniería y con
+medicina. Las tres categorías con F1 = 0 del fine-tuning en test tienen 1 o 3 proyectos en
+test, demasiado pocos para medir su F1 con fiabilidad (la regresión logística deja dos, con
+1 y 2 proyectos).
+
+![Matriz de confusión en test, nivel 1](resultados/graficas/confusion_finetuning_bert_n1_lr3e-05_test.png)
 
 ## Conclusiones y limitaciones
 
-> **Borrador preparado por Sara con los resultados de validación, pendiente de
-> revisión por los tres y de confirmar con la evaluación final en test.**
+Las cifras son de test salvo que se indique lo contrario; todas las decisiones se tomaron
+con validación.
 
 - **El texto basta para predecir el área con bastante acierto, pero hay un techo.** El
-  mejor modelo acierta el 59 % de las 39 categorías de nivel 2 y el 71 % de las 6 de
-  nivel 1, frente al 11 % y el 39 % de la clase mayoritaria. Más de la mitad de los
-  errores son otra categoría válida del proyecto. La elección de una única etiqueta,
-  y no solo el modelo, limita la accuracy medible.
-- **Representaciones.** Con el mismo clasificador, TF-IDF es la mejor en los dos
-  niveles. Word2Vec y BERT congelado quedan por detrás, y su orden entre ellas no es
-  estable con la granularidad (empatan en nivel 1). Un BERT sin adaptar, promediado,
-  no supera a una representación dispersa bien ajustada.
-- **Modelos.** El fine-tuning es el mejor modelo en las dos métricas y en los dos
-  niveles, con diferencias significativas frente a TF-IDF con regresión logística. En
-  nivel 2 eso solo ocurrió al ponderar las clases en la pérdida: la primera versión,
-  sin pesos, perdía en macro-F1 frente a TF-IDF. SciBERT, preentrenado con texto
-  científico, añade una mejora pequeña pero significativa (+0,018 de macro-F1). La red
-  propia no mejora con claridad a la regresión logística.
-- **Desbalance.** Es la limitación principal. Varias categorías tienen menos de 40
-  ejemplos en validación, y los modelos que no ponderan las clases no llegan a
-  predecirlas. En la regresión logística, ponderar cambia accuracy por macro-F1; en el
-  fine-tuning, la ponderación suavizada (raíz de los pesos) sube el macro-F1 en
-  +0,091 sin perder accuracy. Aun así, la categoría más pequeña (2 proyectos en
-  validación) sigue sin acertarse.
-- **Extensión.** Los metadatos administrativos (coste, duración, países) aportan muy
-  poco y, combinados con TF-IDF, empeoran ligeramente el macro-F1.
+  mejor modelo acierta el 60 % de las 39 categorías de nivel 2 y el 72 % de las 6 de
+  nivel 1, frente al 11 % y el 39 % de la clase mayoritaria. Alrededor de la mitad de los
+  errores son otra categoría válida del proyecto, y un tercio de los de nivel 2 cae en una
+  categoría hermana (las dos cosas pueden coincidir en el mismo error): la elección de una
+  única etiqueta, y no solo el modelo, limita la accuracy medible. Con cualquier categoría válida como acierto, la accuracy sería del 81 % y el 89 %.
+- **Representaciones.** Con el mismo clasificador, TF-IDF es la mejor en los dos niveles,
+  seguida de Word2Vec y BERT congelado. El orden no cambia con la granularidad; con 6 clases
+  las diferencias se estrechan y, en macro-F1, solo TF-IDF frente a BERT congelado sigue
+  siendo significativa. Un BERT sin adaptar, promediado, no supera a una representación dispersa
+  bien ajustada.
+- **Modelos.** El fine-tuning es el mejor modelo en las dos métricas y en los dos niveles,
+  con diferencias significativas en test frente a TF-IDF con regresión logística. En nivel
+  2 eso solo se consiguió al ponderar las clases en la pérdida: la primera versión, sin
+  pesos, perdía en macro-F1 frente a TF-IDF (en validación). SciBERT, preentrenado con texto
+  científico, añadió una mejora pequeña pero significativa en validación (+0,018 de
+  macro-F1). La red propia no mejora con claridad a la regresión logística.
+- **Desbalance.** Es la limitación principal. Varias categorías tienen muy pocos ejemplos
+  y los modelos que no ponderan las clases no llegan a predecirlas. En la regresión
+  logística, ponderar cambia accuracy por macro-F1; en el fine-tuning, la ponderación
+  suavizada (raíz de los pesos) subió el macro-F1 en +0,091 sin perder accuracy. Las
+  categorías con 1–3 proyectos en test siguen sin acertarse, y su F1 no se puede medir con
+  fiabilidad.
+- **Extensión.** Los metadatos administrativos (coste, duración, países) aportan muy poco
+  y, combinados con TF-IDF, empeoran ligeramente el macro-F1.
 - **Limitaciones.** Hiperparámetros y mejoras elegidos con validación, con búsquedas
-  pequeñas por el coste de GPU; un único reparto con una sola semilla; resultados de validación, que
-  pueden ser algo optimistas para las configuraciones elegidas; y etiquetas en parte
-  generadas automáticamente y revisadas por expertos.
+  pequeñas por el coste de GPU (la caída de nivel 1 entre validación y test muestra ese
+  optimismo); un único reparto con una sola semilla, así que los intervalos no recogen la
+  variabilidad de reentrenar; categorías con muy pocos proyectos; y etiquetas en parte
+  generadas automáticamente a partir del mismo texto y revisadas por expertos.
 
 ## Para ejecutar
 
@@ -767,18 +864,25 @@ python -m jupyter lab
 El comando `python` debe corresponder al entorno en el que se quiera trabajar.
 Los dos Excel van en `datos/`. Consultar `datos/README.md`.
 
-1. Acordar los datos y las particiones; Izan revisa las funciones comunes.
-2. Mónica ejecuta el cuaderno 1 y Sara puede ejecutar el 3 en paralelo: BERT
-   necesita los resúmenes originales, no los vectores de Mónica.
-3. Izan prepara su código y los metadatos desde el principio y ejecuta los
-   clasificadores conforme recibe los vectores de Mónica y Sara.
-4. Sara hace fine-tuning en paralelo a los modelos de Izan y reúne al final
-   las comparaciones. La evaluación final en test se hace tras cerrar los ajustes.
+Orden de los cuadernos (todos usan `resultados/particiones.csv`):
 
-Las partes pendientes están escritas como tareas. El cálculo completo de BERT
-requiere activar `GENERAR_TODO` en su cuaderno. No hace falta ejecutarlo para
-abrir el proyecto. Para Colab hay que proporcionar los mismos datos,
-`funciones.py` y el CSV de particiones, y situarse en la carpeta del proyecto.
+1. `01_datos_y_representaciones.ipynb`: preparación de etiquetas, exploración,
+   TF-IDF y Word2Vec (ajustados solo con train).
+2. `02_modelos_y_extension.ipynb`: regresión logística, red propia y extensión.
+3. `03_bert_y_comparacion.ipynb`: BERT congelado, fine-tuning y comparación final.
+
+Los resultados ya están en `resultados/`, así que leer el informe o repetir los
+análisis no exige reentrenar. Lo que necesita GPU está desactivado con interruptores
+en el cuaderno 03: `GENERAR_TODO` (extracción de BERT congelado, 16,5 min en una T4),
+`ENTRENAR_FT` y `EJECUTAR_PLAN_MEJORAS` (fine-tuning, unos 30–35 min por modelo en
+una T4). La primera celda del cuaderno 03 prepara el entorno en Colab o Kaggle. La
+evaluación en test del fine-tuning (`EVALUAR_TEST`) solo predice y funciona en CPU;
+necesita los pesos en `modelos/`, que no se suben a GitHub por su tamaño (unos 440 MB
+cada uno), y no repite un nivel que ya tenga sus métricas de test. Antes de
+evaluar comprueba que el modelo cargado reproduce sus predicciones de validación.
+Las versiones con que se entrenó el fine-tuning están en las columnas `torch` y
+`transformers` de `resultados/finetuning_busqueda_nivel*.csv`; la celda de imports
+del cuaderno 03 muestra las de la última ejecución.
 
 `requirements.txt` recoge las dependencias comunes. Las versiones utilizadas
 en los modelos de Izan están guardadas en `resultados/entorno_izan.json`.

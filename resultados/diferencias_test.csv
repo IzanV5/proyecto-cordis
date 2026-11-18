@@ -1,0 +1,17 @@
+pregunta,nivel,modelo_a,modelo_b,dif_accuracy,dif_accuracy_ic,accuracy_significativa,dif_macro_f1,dif_macro_f1_ic,macro_f1_significativa
+Representación (reg. logística): TF-IDF − Word2Vec,2,izan_lr_tfidf_n2,izan_lr_word2vec_n2,0.0478,"(0.0322, 0.0647)",True,0.1085,"(0.0749, 0.1362)",True
+Representación (reg. logística): TF-IDF − BERT congelado,2,izan_lr_tfidf_n2,izan_lr_bert_n2,0.0925,"(0.076, 0.1113)",True,0.1333,"(0.0968, 0.1656)",True
+Representación (reg. logística): Word2Vec − BERT congelado,2,izan_lr_word2vec_n2,izan_lr_bert_n2,0.0447,"(0.0275, 0.0619)",True,0.0248,"(0.0006, 0.0495)",True
+Word2Vec: red propia − reg. logística,2,izan_mlp_word2vec_n2,izan_lr_word2vec_n2,-0.0406,"(-0.0569, -0.0247)",True,0.0179,"(-0.0059, 0.0414)",False
+BERT: fine-tuning − congelado con reg. logística,2,finetuning_scibert_n2_lr3e-05_pesos_ep4,izan_lr_bert_n2,0.2001,"(0.1819, 0.2201)",True,0.2133,"(0.1775, 0.2446)",True
+Fine-tuning − TF-IDF con reg. logística,2,finetuning_scibert_n2_lr3e-05_pesos_ep4,izan_lr_tfidf_n2,0.1075,"(0.0894, 0.1266)",True,0.08,"(0.0482, 0.1117)",True
+Fine-tuning − baseline,2,finetuning_scibert_n2_lr3e-05_pesos_ep4,baseline_mayoritaria_n2,0.4905,"(0.472, 0.5108)",True,0.4742,"(0.4404, 0.4978)",True
+Representación (reg. logística): TF-IDF − Word2Vec,1,izan_lr_tfidf_n1,izan_lr_word2vec_n1,0.0103,"(-0.0041, 0.0247)",False,0.0257,"(-0.0001, 0.0513)",False
+Representación (reg. logística): TF-IDF − BERT congelado,1,izan_lr_tfidf_n1,izan_lr_bert_n1,0.0363,"(0.02, 0.0525)",True,0.0508,"(0.0264, 0.0773)",True
+Representación (reg. logística): Word2Vec − BERT congelado,1,izan_lr_word2vec_n1,izan_lr_bert_n1,0.0259,"(0.0103, 0.0403)",True,0.0251,"(-0.0014, 0.0521)",False
+Word2Vec: red propia − reg. logística,1,izan_mlp_word2vec_n1,izan_lr_word2vec_n1,-0.0331,"(-0.0469, -0.0188)",True,-0.0105,"(-0.0337, 0.0154)",False
+BERT: fine-tuning − congelado con reg. logística,1,finetuning_bert_n1_lr3e-05,izan_lr_bert_n1,0.0925,"(0.0744, 0.1088)",True,0.0872,"(0.0607, 0.113)",True
+Fine-tuning − TF-IDF con reg. logística,1,finetuning_bert_n1_lr3e-05,izan_lr_tfidf_n1,0.0563,"(0.0394, 0.0719)",True,0.0364,"(0.0117, 0.0572)",True
+Fine-tuning − baseline,1,finetuning_bert_n1_lr3e-05,baseline_mayoritaria_n1,0.3235,"(0.2998, 0.346)",True,0.5498,"(0.5238, 0.5729)",True
+Extensión: TF-IDF + metadatos − solo TF-IDF,2,izan_lr_tfidf_metadatos_n2,izan_lr_tfidf_n2,-0.0022,"(-0.0106, 0.0059)",False,-0.0204,"(-0.0417, -0.0016)",True
+Extensión: solo metadatos − baseline,2,izan_lr_metadatos_n2,baseline_mayoritaria_n2,0.0234,"(0.0122, 0.035)",True,0.0206,"(0.0176, 0.0237)",True

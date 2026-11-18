@@ -29,10 +29,25 @@ oficiales usan la primera etiqueta válida de cada proyecto y las mismas clases.
 Las matrices y pesos están en `datos/cache/` y no se suben a GitHub. No hacen
 falta para leer los resultados o para que Sara reúna las predicciones.
 
-## Comparación común (Sara)
+## Archivos de Sara (fine-tuning y comparación común)
 
-`metricas_sara.csv`, `metricas.csv`, `intervalos_val.csv`, `diferencias_val.csv`
-y los resultados de fine-tuning conservan el contenido de Sara. El cuaderno 03
-reúne los CSV personales. La comparación conjunta en test necesita incorporar
-las predicciones del fine-tuning sobre esos mismos 3.199 proyectos; no comparar
-sus métricas de validación con las métricas de test de Izan.
+- `bert_congelado_config.json`: configuración y duración de la extracción de BERT congelado.
+- `metricas_sara.csv`: métricas de validación de todos los fine-tuning probados y de test de
+  los dos elegidos (SciBERT con pesos en nivel 2, BERT original en nivel 1).
+- `finetuning_busqueda_nivel{1,2}.csv`: configuraciones probadas, mejor época, duración y
+  versiones de `torch` y `transformers`; `finetuning_*_historial.json`, historial por época;
+  `finetuning_mapeo_nivel{1,2}.json`, correspondencia entre índices y códigos EuroSciVoc.
+- `predicciones/finetuning_*_{val,test}.csv` y `predicciones/baseline_mayoritaria_*`: mismo
+  esquema `projectID,nivel,conjunto,y_real,y_pred` que el resto del grupo.
+- Comparación común, una versión por conjunto (`_val` con la que se decidió y `_test`, el
+  informe final): `metricas.csv` (todas las métricas), `intervalos_{val,test}.csv`
+  (bootstrap con 1.000 réplicas, semilla 42), `diferencias_{val,test}.csv` (bootstrap
+  pareado por `projectID`; significativa si el IC 95 % no contiene 0),
+  `ranking_representaciones_{val,test}.csv`, `resumen_errores_{val,test}.csv`,
+  `por_clase_*` y `errores_*` (con la marca de si la predicción es otra categoría válida
+  del proyecto).
+- `graficas/`: curvas del fine-tuning, F1 por clase y matrices de confusión de los modelos
+  analizados (`*_val.png` y `*_test.png`).
+
+Los pesos de los modelos ajustados (unos 440 MB cada uno) no están en GitHub: SciBERT de
+nivel 2 está en la salida de la ejecución de Kaggle y BERT de nivel 1 en Drive.

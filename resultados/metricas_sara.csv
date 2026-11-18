@@ -5,3 +5,5 @@ finetuning_bert_n1_lr3e-05,texto original,BERT fine-tuning,1,val,0.7149259954138
 finetuning_bert_n2_lr3e-05_pesos_ep4,texto original,BERT fine-tuning (pesos de clase),2,val,0.5849489264123411,0.4600898194257867
 finetuning_scibert_n2_lr3e-05_pesos_ep4,texto original,SciBERT fine-tuning (pesos de clase),2,val,0.5883885761934542,0.478512099109751
 finetuning_scibert_n1_lr3e-05_pesos_ep4,texto original,SciBERT fine-tuning (pesos de clase),1,val,0.7105482593287471,0.6747794464300158
+finetuning_scibert_n2_lr3e-05_pesos_ep4,texto original,SciBERT fine-tuning (pesos de clase),2,test,0.5989371678649578,0.47923039364713715
+finetuning_bert_n1_lr3e-05,texto original,BERT fine-tuning,1,test,0.7152235073460457,0.6436216441906755
