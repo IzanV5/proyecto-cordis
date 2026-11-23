@@ -74,9 +74,9 @@ Los proyectos se distribuyen entre 6 categorías científicas de primer nivel y 
 
 La distribución de los proyectos entre las 39 categorías científicas de nivel 2 muestra un claro desequilibrio entre clases (ver siguiente figura).
 
-<img width="1389" height="589" alt="image" src="https://github.com/user-attachments/assets/15506219-e65d-47d4-9128-65dc39f88d1a" />
+<img width="1389" height="589" alt="image" src="resultados/graficas/Monica_distribucion_clases.png" />
 
-Las categorías más frecuentes son Basic medicine (3.464 proyectos), Physical sciences (2.912 proyectos) y Computer and information sciences (2.613 proyectos). En cambio, otras categorías cuentan con un número muy reducido de ejemplos.
+Las categorías más frecuentes son Biological sciences (3.464 proyectos), Computer and information sciences (2.912 proyectos) y Physical sciences (2.613 proyectos). En cambio, otras categorías cuentan con un número muy reducido de ejemplos, lo que evidencia un desequilibrio importante entre las clases.
 
 Este desequilibrio puede afectar al entrenamiento de los clasificadores, ya que los modelos pueden aprender a predecir mejor las categorías mayoritarias y presentar dificultades para identificar las minoritarias. Por este motivo, se utilizan dos métricas de evaluación:
 - **Accuracy**: mide la proporción total de predicciones correctas, pero puede ofrecer resultados elevados cuando el modelo favorece las clases mayoritarias.
@@ -86,12 +86,12 @@ Por tanto, macro-F1 se utiliza como métrica principal para comparar los modelos
 
 También se han representado las diez categorías de segundo nivel con mayor número de proyectos mediante un gráfico circular. Los porcentajes de este gráfico corresponden únicamente a las diez categorías seleccionadas.
 
-<img width="932" height="606" alt="image" src="https://github.com/user-attachments/assets/36ca298a-7f9e-4908-b867-f19d9effb6ce" />
+<img width="932" height="606" alt="image" src="resultados/graficas/Monica_top10categoriasNivel2.png" />
 
 ### Longitud de los resúmenes
 Se ha analizado la longitud de los resúmenes para conocer la cantidad de información textual disponible para los modelos.
 
-<img width="989" height="490" alt="image" src="https://github.com/user-attachments/assets/d86f9a4f-3011-4e22-8e48-beae98a7fb8c" />
+<img width="989" height="490" alt="image" src="resultados/graficas/Monica_longitud_resumenes.png" />
 
 La longitud media es de aproximadamente 265 palabras, mientras que la mediana es de 276 palabras.
 Estos resultados muestran que los proyectos suelen disponer de resúmenes relativamente extensos, lo que permite utilizar técnicas de representación textual como TF-IDF, Word2Vec y BERT. Sin embargo, las diferencias de longitud entre documentos pueden influir en las representaciones obtenidas.
@@ -99,13 +99,13 @@ Estos resultados muestran que los proyectos suelen disponer de resúmenes relati
 ### Distribución temporal de los proyectos
 Se ha estudiado la distribución de los proyectos según su año de inicio.
 El año 2019 presenta el mayor número de proyectos, con 4.799 registros.
-<img width="989" height="490" alt="image" src="https://github.com/user-attachments/assets/d8ce5c65-b973-4654-a696-59647d5a09d1" />
+<img width="989" height="490" alt="image" src="resultados/graficas/proyectos_por_anio_monica.png" />
 
 La distribución temporal permite observar cómo varía el número de proyectos registrados a lo largo del periodo analizado.
 
 ### Distribución geográfica
 Se ha analizado la distribución de los proyectos según el país coordinador.
-<img width="989" height="489" alt="image" src="https://github.com/user-attachments/assets/6d942e50-396a-4f1b-9453-d97d5b701e38" />
+<img width="989" height="489" alt="image" src="resultados/graficas/Monica_proyectos_por_pais.png" />
 
 Los países con mayor número de proyectos son:
 - Reino Unido: 5.027 proyectos.
@@ -121,16 +121,16 @@ Entre las palabras frecuentes aparecen términos como *project, new, research, b
 
 Se han generado dos visualizaciones: un gráfico de las palabras más frecuentes y una nube de palabras. Estas visualizaciones permiten conocer las características generales del vocabulario y observar la presencia de términos comunes en numerosos proyectos.
 
-<img width="989" height="690" alt="image" src="https://github.com/user-attachments/assets/71f6cd1a-9d08-4d59-aabb-e76866346f47" />
+<img width="989" height="690" alt="image" src="resultados/graficas/Monica_palabras_frecuentes.png" />
 
-<img width="944" height="504" alt="image" src="https://github.com/user-attachments/assets/1bd73cda-1363-4453-938a-c05e629d2cc0" />
+<img width="944" height="504" alt="image" src="resultados/graficas/Monica_nube_palabras.png" />
 
 
 ### Clasificador de referencia (Baseline)
 Para establecer un punto de comparación inicial, se ha implementado un clasificador que predice siempre la categoría más frecuente del conjunto de entrenamiento, utilizando DummyClassifier con la estrategia most_frequent.
 
 En el conjunto de validación, para la clasificación de nivel 2, se han obtenido los siguientes resultados:
-<img width="687" height="135" alt="image" src="https://github.com/user-attachments/assets/6670ed0c-bb0e-4861-95fc-59092bbeb245" />
+<img width="687" height="135" alt="image" src="resultados/predicciones/Monica_baseline.png" />
 
 La exactitud del 10,83 % refleja la proporción de proyectos pertenecientes a la categoría mayoritaria en validación. Sin embargo, el valor de macro-F1 es muy reducido, ya que el clasificador no consigue identificar correctamente las demás categorías.
 
