@@ -931,5 +931,4 @@ cada miembro y las diapositivas. La presentación y defensa son individuales.
 - Izan utilizó ChatGPT como ayuda para completar y revisar el código y la
   documentación de su parte. Las métricas y figuras proceden de la ejecución
   real del cuaderno y sus comprobaciones.
-- Pendiente de completar con las ayudas utilizadas por Mónica, si corresponde.
 - Mónica utilizó ChatGPT como herramienta de apoyo para identificar y solucionar errores de programación. Los resultados y las gráficas proceden de la ejecución real del cuaderno.
