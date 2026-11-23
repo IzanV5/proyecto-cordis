@@ -202,16 +202,12 @@ Se han generado las representaciones TF-IDF y Word2Vec utilizando los resúmenes
 
 El vocabulario de TF-IDF y los embeddings de Word2Vec se han aprendido exclusivamente con el conjunto de entrenamiento, evitando utilizar información de validación o prueba durante su construcción.
 
-Las dimensiones obtenidas son:
-
-<img width="400" height="206" alt="image" src="https://github.com/user-attachments/assets/866bd283-c943-4a51-9f9a-7668272132b6" />
-
 TF-IDF representa cada proyecto mediante un vector disperso de 10.000 características, mientras que Word2Vec utiliza vectores densos de 300 dimensiones, obtenidos promediando las representaciones de las palabras conocidas.
 
 #### Análisis de palabras fuera del vocabulario (OOV)
 Se ha analizado la proporción de palabras que no aparecen en el vocabulario aprendido por Word2Vec.
 
-<img width="592" height="117" alt="image" src="https://github.com/user-attachments/assets/1702a04e-3e23-4942-9055-c3d2cc2b78d0" />
+[Ver resultados del análisis OOV de Word2Vec](resultados/Monica_word2vec_oov.csv)
 
 Los porcentajes OOV son relativamente bajos, lo que indica que el vocabulario aprendido permite representar la mayoría de los tokens de los documentos.
 
