@@ -46,8 +46,12 @@ falta para leer los resultados o para que Sara reúna las predicciones.
   `ranking_representaciones_{val,test}.csv`, `resumen_errores_{val,test}.csv`,
   `por_clase_*` y `errores_*` (con la marca de si la predicción es otra categoría válida
   del proyecto).
-- `graficas/`: curvas del fine-tuning, F1 por clase y matrices de confusión de los modelos
-  analizados (`*_val.png` y `*_test.png`).
 
-Los pesos de los modelos ajustados (unos 440 MB cada uno) no están en GitHub: SciBERT de
-nivel 2 está en la salida de la ejecución de Kaggle y BERT de nivel 1 en Drive.
+## Archivos de Mónica (análisis exploratorio y representaciones)
+- `01_datos_y_representaciones.ipynb`: cuaderno con la preparación de datos, análisis exploratorio (EDA), preprocesamiento de textos y generación de representaciones TF-IDF y Word2Vec.
+- `Monica_word2vec_oov.csv`: análisis de palabras fuera del vocabulario (OOV) de Word2Vec en los conjuntos de entrenamiento, validación y test.
+- `datos/cache/tfidf.joblib`: representación TF-IDF generada a partir de los textos de entrenamiento, con un máximo de 10.000 características y unigramas y bigramas.
+- `datos/cache/word2vec.joblib`: representación Word2Vec entrenada sobre los textos de entrenamiento, con vectores de 300 dimensiones, ventana de contexto 5 y 10 épocas.
+
+Las matrices y modelos almacenados en datos/cache/ no se suben a GitHub debido a su tamaño, pero permiten reutilizar las representaciones en los clasificadores del resto del equipo.
+
