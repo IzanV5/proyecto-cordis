@@ -923,11 +923,11 @@ cada miembro y las diapositivas. La presentación y defensa son individuales.
   Scientific Text*. EMNLP-IJCNLP. Modelo `allenai/scibert_scivocab_uncased`.
 - Biblioteca Hugging Face Transformers (`AutoModel`, `AutoModelForSequenceClassification`, `Trainer`).
 - GPU de Google Colab (versión original del fine-tuning) y de Kaggle (mejoras).
+- Scikit-learn: regresión logística, preprocesamiento y métricas. PyTorch:
+  implementación de la red propia. Gensim y spaCy: Word2Vec y preprocesamiento.
 - Sara utilizó un asistente de IA (Claude, de Anthropic) como ayuda para preparar y
   revisar el código y los textos de su parte. Todos los resultados proceden de
   ejecuciones reales, registradas en `resultados/`.
-- Scikit-learn: regresión logística, preprocesamiento y métricas. PyTorch:
-  implementación de la red propia. Gensim y spaCy: Word2Vec y preprocesamiento.
 - Izan utilizó ChatGPT como ayuda para completar y revisar el código y la
   documentación de su parte. Las métricas y figuras proceden de la ejecución
   real del cuaderno y sus comprobaciones.
